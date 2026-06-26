@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear Algebra, Decoded — Maths for Data Science</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#0E2A2A; --ink-2:#163d3d; --ink-soft:#3a5a57;
+  --paper:#F4F5F1; --paper-2:#FAFBF7; --card:#fff;
+  --teal:#0E9C73; --teal-soft:#E2F5EE;
+  --violet:#5B4BE0; --violet-soft:#EDEBFB;
+  --amber:#D9870B; --amber-soft:#FBF0DA;
+  --rose:#D23F5B; --rose-soft:#FBE7EB;
+  --rule:#E0E2D9; --rule-strong:#c7cabd;
+  --shadow:0 1px 2px rgba(14,42,42,.04),0 8px 24px rgba(14,42,42,.07);
+  --grid:rgba(14,156,115,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);
+  line-height:1.62;font-size:16px;-webkit-font-smoothing:antialiased;letter-spacing:-.003em}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--teal),var(--violet));z-index:200;transition:width .1s linear}
+
+.layout{display:flex;max-width:1500px;margin:0 auto}
+
+#sidebar{width:320px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+  background:var(--ink);color:#c4d8d4;padding:30px 16px 60px 26px;border-right:1px solid #000}
+#sidebar::-webkit-scrollbar{width:8px}#sidebar::-webkit-scrollbar-thumb{background:#2a4a47;border-radius:4px}
+.brand{margin-bottom:22px;padding-right:8px}
+.brand .kicker{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--teal);font-weight:600}
+.brand h1{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;line-height:1.15;
+  color:#fff;margin-top:7px;letter-spacing:-.01em}
+.brand .code{font-family:'JetBrains Mono',monospace;font-size:11px;color:#6a8a86;margin-top:6px}
+.search-wrap{position:relative;margin-bottom:18px}
+#search{width:100%;padding:9px 12px 9px 32px;border-radius:9px;border:1px solid #234542;
+  background:#163533;color:#e0f0ec;font-family:'Inter',sans-serif;font-size:13px}
+#search::placeholder{color:#5e807c}
+#search:focus{outline:2px solid var(--teal);border-color:transparent}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+.nav-group{margin-bottom:6px}
+.nav-group>.grp-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:#5e827e;font-weight:600;padding:14px 8px 7px;display:flex;align-items:flex-start;gap:8px;line-height:1.3}
+.nav-group>.grp-label .rn{color:var(--teal);font-weight:700}
+#sidebar nav a{display:block;color:#a6c2bd;text-decoration:none;font-size:13.5px;padding:6px 10px;
+  border-radius:7px;margin:1px 0;line-height:1.35;border-left:2px solid transparent;transition:background .12s,color .12s}
+#sidebar nav a:hover{background:#1c3d3a;color:#fff}
+#sidebar nav a.active{background:#1c3d3a;color:#fff;border-left-color:var(--teal);font-weight:500}
+.nav-hide{display:none !important}
+
+main{flex:1;min-width:0;padding:0 0 100px}
+.wrap{max-width:860px;margin:0 auto;padding:0 40px}
+
+.hero{position:relative;overflow:hidden;padding:70px 0 48px;
+  background:linear-gradient(180deg,var(--paper-2),var(--paper));border-bottom:1px solid var(--rule)}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:30px 30px;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 75% 5%,#000,transparent);
+  mask-image:radial-gradient(ellipse 80% 70% at 75% 5%,#000,transparent)}
+.hero .wrap{position:relative;z-index:1}
+.hero .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--teal);font-weight:600;margin-bottom:16px}
+.hero h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(32px,4.6vw,50px);
+  line-height:1.04;letter-spacing:-.022em}
+.hero h2 em{font-style:normal;color:var(--teal)}
+.hero p.sub{font-size:17px;color:var(--ink-soft);max-width:580px;margin-top:18px;line-height:1.55}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.lchip{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);
+  border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:500;box-shadow:var(--shadow)}
+.lchip .dot{width:9px;height:9px;border-radius:50%}
+.lchip.why .dot{background:var(--violet)}
+.lchip.from .dot{background:var(--amber)}
+.lchip.terms .dot{background:var(--teal)}
+.lchip.ex .dot{background:var(--rose)}
+
+/* part divider */
+.partbar{margin:50px 0 6px;padding:18px 22px;border-radius:13px;background:var(--ink);color:#fff;
+  position:relative;overflow:hidden}
+.partbar::after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:22px 22px}
+.partbar>*{position:relative;z-index:1}
+.partbar .pn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);font-weight:700}
+.partbar h3{font-family:'Space Grotesk',sans-serif;font-size:23px;font-weight:600;margin-top:5px;color:#fff;letter-spacing:-.01em}
+
+section.fd{padding:38px 0 8px;border-bottom:1px solid var(--rule);scroll-margin-top:10px}
+.fd-head{display:flex;align-items:baseline;gap:13px;margin-bottom:6px}
+.fd-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--teal);flex-shrink:0;padding-top:5px}
+.fd-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:25px;letter-spacing:-.018em;line-height:1.13}
+.fd-sub{color:var(--ink-soft);font-size:15px;margin:8px 0 0}
+
+.fbig{background:var(--ink);border-radius:14px;padding:24px;margin:20px 0;position:relative;overflow:hidden;text-align:center}
+.fbig::after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:22px 22px}
+.fbig .katex{color:#fff !important;font-size:1.5em}
+.fbig .katex-display{margin:0;position:relative;z-index:1}
+.fbig .fname{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--teal);font-weight:600;margin-bottom:13px}
+.fbig .fbig-txt{position:relative;z-index:1;color:#eafaf4;font-size:16px;font-weight:500;line-height:1.5}
+.fbig .fbig-txt b{color:#fff}
+
+.part{margin:16px 0}
+.plabel{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin-bottom:9px}
+.plabel::before{content:"";width:16px;height:3px;border-radius:2px}
+.plabel.why{color:var(--violet)}.plabel.why::before{background:var(--violet)}
+.plabel.from{color:var(--amber)}.plabel.from::before{background:var(--amber)}
+.plabel.terms{color:var(--teal)}.plabel.terms::before{background:var(--teal)}
+.plabel.ex{color:var(--rose)}.plabel.ex::before{background:var(--rose)}
+.part p{margin:7px 0;color:#27403d}
+.part strong{color:var(--ink);font-weight:600}
+
+.anatomy{background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin-top:6px}
+.term{display:flex;gap:14px;padding:13px 16px;border-top:1px solid var(--rule);align-items:flex-start}
+.term:first-child{border-top:none}
+.term:nth-child(even){background:var(--paper-2)}
+.sym{flex-shrink:0;min-width:50px;height:38px;padding:0 11px;border-radius:9px;background:var(--teal-soft);
+  border:1px solid #c3e9da;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.sym .katex{font-size:1.02em;color:#0a6f52}
+.sym.txt{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#0a6f52}
+.tdef{flex:1;min-width:0}
+.tdef .tname{font-weight:600;color:var(--ink);font-size:14.5px}
+.tdef .ttext{font-size:14px;color:#34504c;margin-top:2px}
+.tdef .tfind{font-size:12.8px;color:var(--ink-soft);margin-top:5px;padding-left:11px;border-left:2px solid var(--rule-strong)}
+.tdef .tfind b{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-right:6px}
+
+.mini{background:var(--rose-soft);border:1px solid #f1cdd5;border-radius:11px;padding:14px 18px;margin-top:6px}
+.mini p{margin:5px 0;font-size:14.5px;color:#3a2530}
+.mini .step b{color:var(--rose);font-family:'JetBrains Mono',monospace;font-size:12px;margin-right:5px}
+
+.callout{border-radius:10px;padding:13px 17px;margin:16px 0;font-size:14.6px;display:flex;gap:12px}
+.callout .ic{flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.key{background:var(--violet-soft);border:1px solid #d8d3f6}.key .ic{background:var(--violet);color:#fff}.key strong{color:#3a2db0}
+.warn{background:var(--amber-soft);border:1px solid #f1dcae}.warn .ic{background:var(--amber);color:#fff}.warn strong{color:#9a5d04}
+.tip{background:var(--teal-soft);border:1px solid #c3e9da}.tip .ic{background:var(--teal);color:#fff}.tip strong{color:#0a6f52}
+
+.tbl{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.tbl th{background:var(--ink);color:#fff;font-weight:600;text-align:left;padding:9px 13px;font-size:12.5px;font-family:'Space Grotesk',sans-serif}
+.tbl td{padding:8px 13px;border-top:1px solid var(--rule);vertical-align:top}
+.tbl tr:nth-child(even) td{background:var(--paper-2)}
+.tbl td:first-child{font-weight:500;color:var(--ink)}
+
+footer{max-width:860px;margin:0 auto;padding:40px 40px 0;color:var(--ink-soft);font-size:13.5px;text-align:center}
+footer .line{height:1px;background:var(--rule);margin-bottom:24px}
+
+#menuBtn{display:none}#overlay{display:none}
+@media(max-width:980px){
+  #sidebar{position:fixed;left:0;top:0;z-index:150;transform:translateX(-100%);transition:transform .25s ease;width:300px;box-shadow:0 0 40px rgba(0,0,0,.3)}
+  #sidebar.open{transform:translateX(0)}
+  #menuBtn{display:flex;align-items:center;gap:8px;position:fixed;top:14px;left:14px;z-index:160;
+    background:var(--ink);color:#fff;border:none;border-radius:10px;padding:10px 14px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+  #overlay.show{display:block;position:fixed;inset:0;background:rgba(10,30,28,.5);z-index:140}
+  .wrap{padding:0 22px}.hero{padding-top:78px}footer{padding-left:22px;padding-right:22px}
+}
+@media(max-width:560px){.fbig .katex{font-size:1.12em}.term{flex-wrap:wrap}}
+:focus-visible{outline:2.5px solid var(--teal);outline-offset:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="menuBtn">☰ Topics</button>
+<div id="overlay"></div>
+
+<div class="layout">
+<aside id="sidebar">
+  <div class="brand">
+    <div class="kicker">Companion · Decoded</div>
+    <h1>Linear Algebra,<br>Explained</h1>
+    <div class="code">203MDS · every concept, built up</div>
+  </div>
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7aa39d" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="search" type="text" placeholder="Search a concept…" autocomplete="off">
+  </div>
+
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">I.</span><span>Determinants &amp; Inverses</span></div>
+    <nav>
+      <a href="#det-scale">Determinant as a Scaling Factor</a>
+      <a href="#complexity">Computational Complexity</a>
+      <a href="#identity">The Identity Matrix</a>
+      <a href="#inverse">The Matrix Inverse</a>
+      <a href="#path">Path to the Inverse</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">II.</span><span>Rank, Null Space &amp; Echelon</span></div>
+    <nav>
+      <a href="#rank">Matrix Rank</a>
+      <a href="#echelon">Echelon Form</a>
+      <a href="#null">Null Space &amp; Nullity</a>
+      <a href="#info">Rank vs Nullity (Information)</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">III.</span><span>Vectors &amp; Vector Spaces</span></div>
+    <nav>
+      <a href="#perspectives">Three Perspectives on a Vector</a>
+      <a href="#vecops">Vector Operations</a>
+      <a href="#lincomb">Linear Combinations</a>
+      <a href="#basis">Basis &amp; Dimension</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">IV.</span><span>Geometry &amp; Machine Learning</span></div>
+    <nav>
+      <a href="#hyperplane">Hyperplanes</a>
+      <a href="#classify">Classification &amp; Half-Spaces</a>
+      <a href="#distance">Distance to a Plane</a>
+      <a href="#dot">The Dot Product</a>
+      <a href="#cosine">Cosine Similarity</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">V.</span><span>Advanced Ops &amp; Eigen-Theory</span></div>
+    <nav>
+      <a href="#transpose">The Transpose</a>
+      <a href="#eigen">Eigenvalues &amp; Eigenvectors</a>
+      <a href="#trace">Trace &amp; Determinant Link</a>
+    </nav>
+  </div>
+</aside>
+
+<main>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Volume II · the geometry behind the algebra</div>
+      <h2>Linear algebra,<br><em>one idea at a time.</em></h2>
+      <p class="sub">Every concept from the course outline — determinants, rank, vectors, hyperplanes, eigenvalues — taken apart the same way: what it's for, where it comes from, what each symbol means, and a worked example. Built to make the geometry click.</p>
+      <div class="legend">
+        <div class="lchip why"><span class="dot"></span>Why we need it</div>
+        <div class="lchip from"><span class="dot"></span>Where it comes from</div>
+        <div class="lchip terms"><span class="dot"></span>Each term decoded</div>
+        <div class="lchip ex"><span class="dot"></span>Try it</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+  <!-- ===================== PART I ===================== -->
+  <div class="partbar"><div class="pn">Part I</div><h3>Determinants &amp; Matrix Inverses</h3></div>
+
+  <!-- DET SCALE -->
+  <section class="fd" id="det-scale">
+    <div class="fd-head"><span class="fd-num">L01</span><h3 class="fd-title">The Determinant as a Scaling Factor</h3></div>
+    <p class="fd-sub">What that single number actually <em>means</em> geometrically.</p>
+
+    <div class="fbig"><div class="fname">2×2 Determinant</div>$$\det\begin{bmatrix}a&b\\c&d\end{bmatrix}=ad-bc$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A matrix doesn't just hold numbers — it <strong>transforms space</strong> (stretching, rotating, shearing it). The determinant tells you the <strong>area scaling factor</strong> of that transformation in 2D (volume in 3D). A determinant of 2 means the transformation doubles areas; 0.5 means it halves them. Most importantly, a determinant of <strong>0 means space has been squashed</strong> into a lower dimension — a 2D plane crushed onto a line — which destroys information permanently.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>The two columns of the matrix are vectors. They span a <strong>parallelogram</strong>, and the area of that parallelogram is exactly $ad-bc$. If the two columns point along the same line (one is a multiple of the other), the parallelogram collapses to a flat sliver of zero area — and $ad-bc=0$. That collapse is the geometric meaning of "linearly dependent," "singular," and "no inverse," all at once.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$a,d$</span><div class="tdef"><div class="tname">Main-diagonal entries</div><div class="ttext">Top-left and bottom-right; their product is the first piece.</div></div></div>
+        <div class="term"><span class="sym">$b,c$</span><div class="tdef"><div class="tname">Anti-diagonal entries</div><div class="ttext">Top-right and bottom-left; their product is subtracted.</div></div></div>
+      </div>
+    </div>
+    <div class="callout key"><span class="ic">!</span><div><strong>The big takeaway:</strong> $\det=0 \Leftrightarrow$ space is squashed flat $\Leftrightarrow$ the matrix is singular $\Leftrightarrow$ no inverse exists. One number, four consequences.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\begin{bmatrix}2&3\\1&4\end{bmatrix}$ vs $\begin{bmatrix}2&4\\1&2\end{bmatrix}$.</p>
+        <p class="step"><b>1</b> First: $2(4)-3(1)=5$ → scales area ×5, invertible.</p>
+        <p class="step"><b>2</b> Second: $2(2)-4(1)=0$ → squashed flat, singular (column 2 = 2× column 1).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMPLEXITY -->
+  <section class="fd" id="complexity">
+    <div class="fd-head"><span class="fd-num">L02</span><h3 class="fd-title">Computational Complexity of Determinants</h3></div>
+    <p class="fd-sub">Why the "obvious" method is unusable, and why properties matter.</p>
+
+    <div class="fbig"><div class="fname">Cost of expansion by minors</div>$$\text{operations}\ \approx\ n!\qquad 10!=3{,}628{,}800$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Determinants are computed constantly in AI and engineering. But the textbook method — <strong>expansion by minors</strong> (cofactor expansion) — becomes catastrophically slow as the matrix grows. Knowing <em>why</em> tells you to never use it on large matrices, and to reach for determinant <strong>properties</strong> instead.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Expansion by minors breaks an $n\times n$ determinant into $n$ smaller $(n-1)\times(n-1)$ determinants, each of which breaks into $(n-1)$ even smaller ones, and so on. That branching multiplies out to roughly <strong>$n!$ (n-factorial) operations.</strong> For a modest $10\times10$ matrix that's $10!=3.6$ million calculations; for $20\times20$ it exceeds the number of seconds since the Big Bang. The factorial growth is the killer.</p>
+      <p><strong>The fix:</strong> use properties of determinants — especially that row-reduction to a triangular form lets you just <strong>multiply the diagonal</strong>. That approach costs about $n^3$ operations instead of $n!$ — for $n=10$, that's ~1,000 vs 3.6 million.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$n$</span><div class="tdef"><div class="tname">Matrix size</div><div class="ttext">The number of rows (= columns) of a square matrix.</div></div></div>
+        <div class="term"><span class="sym">$n!$</span><div class="tdef"><div class="tname">n factorial — the cost</div><div class="ttext">$n\times(n-1)\times\dots\times1$; grows faster than any power of n.</div><div class="tfind"><b>find it</b> e.g. $5!=120$, $10!=3{,}628{,}800$</div></div></div>
+        <div class="term"><span class="sym txt">n³</span><div class="tdef"><div class="tname">Cost of the smart method</div><div class="ttext">Row-reduce to triangular, then multiply the diagonal.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Compare the two methods for a 10×10 matrix.</p>
+        <p class="step"><b>1</b> Minors: $10! = 3{,}628{,}800$ operations.</p>
+        <p class="step"><b>2</b> Row-reduction: $\approx 10^3 = 1{,}000$ operations — about <b>3,600× faster.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- IDENTITY -->
+  <section class="fd" id="identity">
+    <div class="fd-head"><span class="fd-num">L03</span><h3 class="fd-title">The Identity Matrix</h3></div>
+    <p class="fd-sub">The matrix that does nothing — and why that's useful.</p>
+
+    <div class="fbig"><div class="fname">Identity &amp; its determinant</div>$$I=\begin{bmatrix}1&0\\0&1\end{bmatrix},\qquad \det(I)=1$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The identity matrix $I$ is the matrix equivalent of the number <strong>1</strong>: multiplying any matrix by $I$ leaves it unchanged ($AI=A$). It's the "do-nothing" transformation, and it's the target you aim for when finding an inverse (since $A A^{-1}=I$) and the reference point in the eigenvalue equation.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>$I$ has 1s on the diagonal and 0s everywhere else, so when it transforms space, every axis maps to itself — nothing moves, nothing stretches. Since it doesn't change any areas or volumes, its <strong>scaling factor is 1</strong> → $\det(I)=1$. The determinant of <em>any</em> identity matrix, of any size, is always 1.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$I$</span><div class="tdef"><div class="tname">Identity matrix</div><div class="ttext">1s on the diagonal, 0s elsewhere.</div></div></div>
+        <div class="term"><span class="sym">$\det(I)$</div></span><div class="tdef"><div class="tname">Its determinant</div><div class="ttext">Always 1 — a transformation that leaves volume untouched.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\det\begin{bmatrix}1&0\\0&1\end{bmatrix}=1(1)-0(0)=1$ ✓ — confirms the "no change" idea.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVERSE -->
+  <section class="fd" id="inverse">
+    <div class="fd-head"><span class="fd-num">L04</span><h3 class="fd-title">The Matrix Inverse</h3></div>
+    <p class="fd-sub">The "undo" matrix, and the two conditions it requires.</p>
+
+    <div class="fbig"><div class="fname">Definition of the inverse</div>$$AB=I\ \Longrightarrow\ B=A^{-1}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The inverse <strong>reverses</strong> a transformation and is how we solve $A\mathbf{x}=\mathbf{b}$ — the matrix version of dividing. Just as $5x=10$ is solved by multiplying by $\tfrac15$, the system $A\mathbf{x}=\mathbf{b}$ is solved by multiplying both sides by $A^{-1}$ to get $\mathbf{x}=A^{-1}\mathbf{b}$.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>If a matrix $A$ does something to space, its inverse $B$ is the matrix that <strong>perfectly undoes it</strong> — do $A$ then $B$ and you're back where you started, i.e. $AB=I$. That's the entire definition.</p>
+      <p><strong>Two conditions must hold:</strong></p>
+      <p>• <strong>Square</strong> — input and output dimensions must match, or you can't map back exactly.</p>
+      <p>• <strong>Determinant ≠ 0</strong> — if $\det A=0$ the transformation squashed space flat (L01), permanently losing information, so there's no way to reverse it. (And the inverse formula divides by $\det A$ — you can't divide by zero.)</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$A$</span><div class="tdef"><div class="tname">The original matrix</div><div class="ttext">Must be square with non-zero determinant to be invertible.</div></div></div>
+        <div class="term"><span class="sym">$A^{-1}$</span><div class="tdef"><div class="tname">The inverse</div><div class="ttext">Reverses A; satisfies $A A^{-1}=I$.</div></div></div>
+        <div class="term"><span class="sym">$I$</span><div class="tdef"><div class="tname">Identity</div><div class="ttext">The "do-nothing" result that proves B undoes A.</div></div></div>
+      </div>
+    </div>
+    <div class="callout warn"><span class="ic">!</span><div><strong>A matrix with $\det=0$ is called singular</strong> — it has no inverse. Always check the determinant first; if it's 0, stop.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Is $\begin{bmatrix}1&2\\2&4\end{bmatrix}$ invertible?</p>
+        <p class="step"><b>1</b> $\det = 1(4)-2(2)=0$ → <b>no inverse</b> (singular; row 2 = 2× row 1).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PATH TO INVERSE -->
+  <section class="fd" id="path">
+    <div class="fd-head"><span class="fd-num">L05</span><h3 class="fd-title">The Path to the Inverse</h3></div>
+    <p class="fd-sub">Three stepping stones: minors → cofactors → adjoint → inverse.</p>
+
+    <div class="fbig"><div class="fname">The full pipeline</div>$$A^{-1}=\frac{1}{\det A}\,\text{adj}(A)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>For a general matrix (especially 3×3 and up) there's no one-line shortcut for the inverse. Instead you build it through three intermediate objects. Knowing the chain means you can invert <em>any</em> invertible matrix, not just memorize the 2×2 trick.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Work through it as a relay of four stages:</p>
+      <p><strong>1 · Minors.</strong> For each entry, delete its row and column and take the determinant of what remains. That's the <strong>minor</strong> $M_{ij}$ — a "sub-determinant."</p>
+      <p><strong>2 · Cofactors.</strong> Attach a checkerboard of signs: $C_{ij}=(-1)^{i+j}M_{ij}$. Some minors flip sign; the pattern is $+\,-\,+\,\dots$</p>
+      <p><strong>3 · Adjoint.</strong> Form the matrix of cofactors, then <strong>transpose it</strong> (flip rows↔columns). That's the adjoint, $\text{adj}(A)$.</p>
+      <p><strong>4 · Divide by the determinant.</strong> $A^{-1}=\tfrac{1}{\det A}\text{adj}(A)$. This last division is the same $\tfrac15$ idea — and again shows why $\det A=0$ blocks the inverse.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$M_{ij}$</span><div class="tdef"><div class="tname">Minor</div><div class="ttext">Determinant of the submatrix after deleting row i and column j.</div><div class="tfind"><b>find it</b> cross out row i &amp; col j, take the det of the rest</div></div></div>
+        <div class="term"><span class="sym">$C_{ij}$</span><div class="tdef"><div class="tname">Cofactor</div><div class="ttext">A minor with the sign $(-1)^{i+j}$ applied.</div><div class="tfind"><b>find it</b> $C_{ij}=(-1)^{i+j}M_{ij}$</div></div></div>
+        <div class="term"><span class="sym txt">adj</span><div class="tdef"><div class="tname">Adjoint</div><div class="ttext">Transpose of the cofactor matrix.</div><div class="tfind"><b>find it</b> build the cofactor matrix, then swap rows↔columns</div></div></div>
+        <div class="term"><span class="sym">$\det A$</span><div class="tdef"><div class="tname">Determinant</div><div class="ttext">The final divisor; must be non-zero.</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>Why the 2×2 shortcut works:</strong> apply this pipeline to a 2×2 and the cofactor/adjoint steps collapse into exactly "swap the diagonal, negate the off-diagonal" — i.e. $A^{-1}=\frac{1}{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}$.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$A=\begin{bmatrix}2&1\\5&3\end{bmatrix}$ via the pipeline.</p>
+        <p class="step"><b>1</b> Cofactors give adjoint $\begin{bmatrix}3&-1\\-5&2\end{bmatrix}$.</p>
+        <p class="step"><b>2</b> $\det A=1$, so $A^{-1}=\frac{1}{1}\begin{bmatrix}3&-1\\-5&2\end{bmatrix}=\begin{bmatrix}3&-1\\-5&2\end{bmatrix}$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART II ===================== -->
+  <div class="partbar"><div class="pn">Part II</div><h3>Rank, Null Space &amp; Echelon Form</h3></div>
+
+  <!-- RANK -->
+  <section class="fd" id="rank">
+    <div class="fd-head"><span class="fd-num">L06</span><h3 class="fd-title">Matrix Rank</h3></div>
+    <p class="fd-sub">How many genuinely independent directions a matrix carries.</p>
+
+    <div class="fbig"><div class="fname">Rank</div><div class="fbig-txt">rank = number of <b>linearly independent</b> rows (= columns)<br>= the <b>dimension</b> of the space the matrix spans</div></div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Rank measures the amount of <strong>genuine, non-redundant information</strong> in a matrix. In data science, if two features are really the same information in disguise, they don't add a new dimension — rank tells you how many truly independent features (or equations) you have.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Each row (or column) points in some direction. If a row can be <strong>built from the others</strong> by scaling and adding (a linear combination), it adds nothing new — it's redundant. Rank simply counts the rows that <em>do</em> add a new independent direction. Geometrically that's the <strong>dimension of the space</strong> the matrix's rows/columns span — a line is dimension 1, a plane dimension 2, and so on.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym txt">indep.</span><div class="tdef"><div class="tname">Linearly independent</div><div class="ttext">No row/column is a combination of the others.</div></div></div>
+        <div class="term"><span class="sym txt">span</span><div class="tdef"><div class="tname">Span</div><div class="ttext">All points reachable by combining the rows/columns.</div></div></div>
+      </div>
+    </div>
+    <div class="callout key"><span class="ic">!</span><div><strong>Square-matrix link:</strong> an $n\times n$ matrix has full rank $n$ exactly when $\det\neq0$ — that's the same as being invertible. Lose rank → determinant becomes 0 → no inverse.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\begin{bmatrix}1&2\\2&4\end{bmatrix}$.</p>
+        <p class="step"><b>1</b> Row 2 = 2× row 1 → only 1 independent row → <b>rank = 1</b> (not 2).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ECHELON -->
+  <section class="fd" id="echelon">
+    <div class="fd-head"><span class="fd-num">L07</span><h3 class="fd-title">Echelon Form</h3></div>
+    <p class="fd-sub">The "staircase" form that makes rank obvious.</p>
+
+    <div class="fbig"><div class="fname">Row Echelon Form</div>$$\begin{bmatrix}\mathbf{1}&*&*\\0&\mathbf{1}&*\\0&0&\mathbf{0}\end{bmatrix}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Reading rank or independence straight off a messy matrix is hard. Echelon form is a tidy, standardized state you reach with simple row operations — and once a matrix is in it, the <strong>rank is just the count of non-zero rows.</strong> It also makes solving linear systems straightforward.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Using row operations (swapping rows, scaling a row, adding a multiple of one row to another — none of which change the rank), you arrange the matrix into a <strong>staircase</strong>:</p>
+      <p>• Each row's first non-zero entry (its <strong>pivot</strong>) sits <strong>further to the right</strong> than the pivot in the row above.</p>
+      <p>• Any <strong>all-zero rows sink to the bottom.</strong></p>
+      <p>Each pivot marks one genuinely independent direction, so the number of pivots (= non-zero rows) <em>is</em> the rank.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym txt">pivot</span><div class="tdef"><div class="tname">Pivot (leading entry)</div><div class="ttext">The first non-zero number in a row; anchors a step of the staircase.</div></div></div>
+        <div class="term"><span class="sym">$*$</span><div class="tdef"><div class="tname">Any value</div><div class="ttext">Entries to the right of a pivot can be anything.</div></div></div>
+        <div class="term"><span class="sym">$0$</span><div class="tdef"><div class="tname">Forced zeros</div><div class="ttext">Everything below each pivot is cleared to zero.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\begin{bmatrix}1&2&3\\2&4&6\\1&0&1\end{bmatrix}$.</p>
+        <p class="step"><b>1</b> $R_2-2R_1=(0,0,0)$; $R_3-R_1=(0,-2,-2)$.</p>
+        <p class="step"><b>2</b> Reorder → two non-zero rows → <b>rank = 2.</b></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NULL -->
+  <section class="fd" id="null">
+    <div class="fd-head"><span class="fd-num">L08</span><h3 class="fd-title">Null Space &amp; Nullity</h3></div>
+    <p class="fd-sub">The directions a matrix collapses to zero — and what they reveal about data.</p>
+
+    <div class="fbig"><div class="fname">Null Space</div>$$\text{Null}(A)=\{\mathbf{x}\ :\ A\mathbf{x}=\mathbf{0}\}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The null space captures <strong>redundancy</strong>. In a dataset, if you include both <em>"Monthly Salary"</em> and <em>"Annual Salary,"</em> the second is just 12× the first — no new information. That kind of redundancy shows up as a non-trivial null space, and its size (the nullity) measures <strong>how much repeated/derivable information</strong> your matrix contains.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Ask: which input vectors $\mathbf{x}$ does the matrix crush to the zero vector? Those are the solutions of $A\mathbf{x}=\mathbf{0}$. If the only solution is $\mathbf{x}=\mathbf{0}$, nothing is being collapsed (no redundancy). But if non-zero $\mathbf{x}$ also map to $\mathbf{0}$, the matrix is throwing away directions — and the set of all such $\mathbf{x}$ forms the <strong>null space</strong>, a subspace. Its <strong>dimension is the nullity.</strong></p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$A\mathbf{x}$</span><div class="tdef"><div class="tname">Matrix times vector</div><div class="ttext">The transformed input.</div></div></div>
+        <div class="term"><span class="sym">$\mathbf{0}$</span><div class="tdef"><div class="tname">The zero vector</div><div class="ttext">The collapse target — all components zero.</div></div></div>
+        <div class="term"><span class="sym txt">nullity</span><div class="tdef"><div class="tname">Nullity</div><div class="ttext">Dimension of the null space = amount of redundancy.</div><div class="tfind"><b>find it</b> columns − rank (rank–nullity, see L09)</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>A 2-feature matrix where column 2 = 12 × column 1 (Monthly vs Annual salary).</p>
+        <p class="step"><b>1</b> Rank = 1 (one real direction), 2 columns → nullity = 1.</p>
+        <p class="step"><b>2</b> That nullity of 1 = the one redundant feature.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFO -->
+  <section class="fd" id="info">
+    <div class="fd-head"><span class="fd-num">L09</span><h3 class="fd-title">Rank vs Nullity — Information &amp; Redundancy</h3></div>
+    <p class="fd-sub">Every column is either new information or repeated information.</p>
+
+    <div class="fbig"><div class="fname">Rank–Nullity Theorem</div>$$\operatorname{rank}(A)+\operatorname{nullity}(A)=\text{number of columns}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>It splits a matrix's content into two clean buckets: <strong>rank = useful, independent information</strong> and <strong>nullity = redundant information</strong>. Together they account for every column. This instantly tells you how compressible a dataset is and whether a linear system has a unique or infinitely-many solutions.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Think of each column as one unit of input. When the matrix acts, that column either <strong>adds a genuinely new output direction</strong> — counting toward the <strong>rank</strong> — or it's a combination of others and collapses to zero, contributing a direction to the null space and counting toward <strong>nullity</strong>. Every column lands in exactly one bucket, so the two must sum to the total number of columns. It's conservation of dimensions.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym txt">rank</span><div class="tdef"><div class="tname">Useful information</div><div class="ttext">Independent directions the matrix actually keeps.</div><div class="tfind"><b>find it</b> count pivots in echelon form (L07)</div></div></div>
+        <div class="term"><span class="sym txt">nullity</span><div class="tdef"><div class="tname">Redundant information</div><div class="ttext">Directions collapsed to zero.</div><div class="tfind"><b>find it</b> columns − rank</div></div></div>
+        <div class="term"><span class="sym txt">cols</span><div class="tdef"><div class="tname">Total columns</div><div class="ttext">All input dimensions.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>A matrix with 5 columns and rank 3.</p>
+        <p class="step"><b>1</b> nullity $=5-3=2$ → 3 columns carry real info, 2 are redundant.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART III ===================== -->
+  <div class="partbar"><div class="pn">Part III</div><h3>Vectors &amp; Vector Spaces</h3></div>
+
+  <!-- PERSPECTIVES -->
+  <section class="fd" id="perspectives">
+    <div class="fd-head"><span class="fd-num">L10</span><h3 class="fd-title">Three Perspectives on a Vector</h3></div>
+    <p class="fd-sub">The same object, seen through three different lenses.</p>
+
+    <div class="fbig"><div class="fname">One vector, three views</div>$$\mathbf{v}=(v_1,v_2,\dots,v_n)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>"Vector" means slightly different things in different fields, and data science <strong>borrows from all three</strong>. Seeing the connections lets you use geometric intuition (from physics) on what is really just a list of numbers (computer science), backed by rigorous rules (mathematics).</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <table class="tbl">
+        <tr><th>Lens</th><th>A vector is…</th><th>Example</th></tr>
+        <tr><td>Physics</td><td>An arrow with <strong>magnitude and direction</strong></td><td>velocity, force</td></tr>
+        <tr><td>Computer Science</td><td>An <strong>ordered list of data</strong></td><td>a row of features: [age, height, income]</td></tr>
+        <tr><td>Mathematics</td><td>An <strong>abstract object</strong> obeying addition &amp; scaling rules</td><td>any element of a vector space</td></tr>
+      </table>
+      <p>The mathematical view is the most general: as long as your objects can be <strong>added together</strong> and <strong>scaled by numbers</strong> following the usual laws, they count as vectors — even if they're not arrows or lists.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf{v}$</span><div class="tdef"><div class="tname">The vector</div><div class="ttext">The whole object, however you picture it.</div></div></div>
+        <div class="term"><span class="sym">$v_i$</span><div class="tdef"><div class="tname">A component</div><div class="ttext">The i-th number in the list / coordinate of the arrow.</div></div></div>
+        <div class="term"><span class="sym">$n$</span><div class="tdef"><div class="tname">Dimension</div><div class="ttext">How many components — the number of features in CS terms.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$(3,4)$ — the same object three ways:</p>
+        <p class="step"><b>Physics</b> an arrow of length 5 pointing up-and-right.</p>
+        <p class="step"><b>CS</b> a 2-feature data record.</p>
+        <p class="step"><b>Math</b> an element of the space $\mathbb{R}^2$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VEC OPS -->
+  <section class="fd" id="vecops">
+    <div class="fd-head"><span class="fd-num">L11</span><h3 class="fd-title">Vector Operations</h3></div>
+    <p class="fd-sub">Adding vectors, and stretching/shrinking/flipping them.</p>
+
+    <div class="fbig"><div class="fname">Addition &amp; scalar multiplication</div>$$\mathbf{a}+\mathbf{b}=(a_1+b_1,\ a_2+b_2)\qquad c\mathbf{a}=(ca_1,\ ca_2)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Addition and scalar multiplication are the <strong>only two operations</strong> a vector space is built on — every other idea (linear combinations, span, basis) is made from them. Geometrically they're how you move around and rescale within a space.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>Addition</strong> — combine two vectors component-by-component. Visually, place the tail of $\mathbf b$ at the head of $\mathbf a$ (the <strong>head-to-tail</strong> method); the arrow from start to finish is $\mathbf a+\mathbf b$. Equivalently, the <strong>parallelogram law</strong>: $\mathbf a+\mathbf b$ is the diagonal of the parallelogram they form.</p>
+      <p><strong>Scalar multiplication</strong> — multiply every component by a number $c$. This <strong>stretches</strong> the vector when $|c|>1$, <strong>shrinks</strong> it when $|c|<1$, and <strong>reverses</strong> its direction when $c<0$ — but it never tilts it off its line.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf a,\mathbf b$</span><div class="tdef"><div class="tname">The vectors</div><div class="ttext">Added component-by-component.</div></div></div>
+        <div class="term"><span class="sym">$c$</span><div class="tdef"><div class="tname">A scalar</div><div class="ttext">A plain number. $|c|>1$ stretch · $|c|<1$ shrink · $c<0$ flip.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\mathbf a=(1,2)$, $\mathbf b=(3,1)$.</p>
+        <p class="step"><b>1</b> $\mathbf a+\mathbf b=(4,3)$.</p>
+        <p class="step"><b>2</b> $-2\mathbf a=(-2,-4)$ — twice as long and reversed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIN COMB -->
+  <section class="fd" id="lincomb">
+    <div class="fd-head"><span class="fd-num">L12</span><h3 class="fd-title">Linear Combinations</h3></div>
+    <p class="fd-sub">Mixing building-block vectors to reach new points.</p>
+
+    <div class="fbig"><div class="fname">Linear Combination</div>$$\mathbf{v}=x\mathbf{a}+y\mathbf{b}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A linear combination is how you <strong>reach new vectors from a few you already have</strong>. This single idea underlies span (everything you can reach), linear dependence (when one vector is redundant), and basis (a minimal reaching-set) — the backbone of the whole subject.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>It's just the two basic operations used together: <strong>scale</strong> each vector ($x\mathbf a$, $y\mathbf b$) and then <strong>add</strong> the results. By choosing the weights $x$ and $y$, you can land on many different points. A vector $\mathbf v$ "is a linear combination of $\mathbf a$ and $\mathbf b$" exactly when some choice of $x,y$ produces it.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$x,y$</span><div class="tdef"><div class="tname">The weights (scalars)</div><div class="ttext">How much of each building-block vector to use.</div><div class="tfind"><b>find it</b> solve the equation $x\mathbf a+y\mathbf b=\mathbf v$</div></div></div>
+        <div class="term"><span class="sym">$\mathbf a,\mathbf b$</span><div class="tdef"><div class="tname">The building-block vectors</div><div class="ttext">The ingredients you're mixing.</div></div></div>
+        <div class="term"><span class="sym">$\mathbf v$</span><div class="tdef"><div class="tname">The result</div><div class="ttext">The vector you reach.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Can $(5,4)$ be made from $\mathbf a=(1,0)$ and $\mathbf b=(0,1)$?</p>
+        <p class="step"><b>1</b> $5\mathbf a+4\mathbf b=(5,0)+(0,4)=(5,4)$ ✓ — weights $x=5,y=4$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BASIS -->
+  <section class="fd" id="basis">
+    <div class="fd-head"><span class="fd-num">L13</span><h3 class="fd-title">Basis &amp; Dimension</h3></div>
+    <p class="fd-sub">The minimal set of vectors that can reach everywhere.</p>
+
+    <div class="fbig"><div class="fname">Standard Basis of ℝ²</div>$$\hat{\imath}=(1,0)\qquad \hat{\jmath}=(0,1)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A basis is a set of <strong>independent building-block vectors</strong> from which every point in the space can be reached by a linear combination. It gives you a coordinate system, and the number of vectors in it — the <strong>dimension</strong> — tells you how many independent directions the space has.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>You want a reaching-set that is both <strong>sufficient</strong> (spans the whole space — you can get anywhere) and <strong>not wasteful</strong> (linearly independent — no vector is redundant). That "just enough, no more" set is a <strong>basis</strong>. The <strong>standard basis vectors</strong> $\hat{\imath},\hat{\jmath}$ are the simplest choice — unit arrows along each axis — so any vector $(x,y)=x\hat{\imath}+y\hat{\jmath}$ reads straight off its coordinates.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\hat{\imath},\hat{\jmath}$</span><div class="tdef"><div class="tname">Standard basis vectors</div><div class="ttext">Unit vectors along the x- and y-axes; the default building blocks.</div></div></div>
+        <div class="term"><span class="sym txt">dim</span><div class="tdef"><div class="tname">Dimension</div><div class="ttext">Number of vectors in a basis (2 for a plane, 3 for space).</div><div class="tfind"><b>find it</b> count the basis vectors</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Express $(7,-3)$ in the standard basis.</p>
+        <p class="step"><b>1</b> $(7,-3)=7\hat{\imath}-3\hat{\jmath}$ — the coordinates <em>are</em> the weights.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART IV ===================== -->
+  <div class="partbar"><div class="pn">Part IV</div><h3>Geometric Concepts &amp; Machine Learning</h3></div>
+
+  <!-- HYPERPLANE -->
+  <section class="fd" id="hyperplane">
+    <div class="fd-head"><span class="fd-num">L14</span><h3 class="fd-title">Hyperplanes</h3></div>
+    <p class="fd-sub">One equation that means "line," "plane," or higher — depending on dimension.</p>
+
+    <div class="fbig"><div class="fname">Hyperplane equation</div>$$\mathbf{w}^{T}\mathbf{x}+b=0$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A hyperplane is a flat boundary that <strong>splits a space into two sides</strong>. It's the central object in linear classifiers (like SVMs): one side is "class A," the other "class B." The same formula works in any dimension, which is why it's written generally.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>The expression $\mathbf w^T\mathbf x$ is a <strong>dot product</strong> — it measures how far the point $\mathbf x$ extends along the direction $\mathbf w$. Setting $\mathbf w^T\mathbf x+b=0$ picks out exactly the points at one fixed "level" in that direction, which forms a flat sheet perpendicular to $\mathbf w$. In <strong>2D that sheet is a line, in 3D a plane, in 4D+ a hyperplane</strong> — same equation, the dimension just changes how we picture it.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf w$</span><div class="tdef"><div class="tname">Normal (weight) vector</div><div class="ttext">Points perpendicular to the boundary; sets its orientation.</div></div></div>
+        <div class="term"><span class="sym">$\mathbf x$</span><div class="tdef"><div class="tname">A point in space</div><div class="ttext">The coordinates being tested.</div></div></div>
+        <div class="term"><span class="sym">$b$</span><div class="tdef"><div class="tname">Bias / offset</div><div class="ttext">Shifts the boundary away from the origin.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\mathbf w=(1,1)$, $b=-2$ gives $x_1+x_2-2=0$, i.e. the line $x_1+x_2=2$ in 2D.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLASSIFY -->
+  <section class="fd" id="classify">
+    <div class="fd-head"><span class="fd-num">L15</span><h3 class="fd-title">Binary Classification &amp; Half-Spaces</h3></div>
+    <p class="fd-sub">Which side of the boundary a point lands on.</p>
+
+    <div class="fbig"><div class="fname">The sign decides the class</div>$$\mathbf{w}\cdot\mathbf{x}+w_0>0\ \to\ \text{positive side}\qquad <0\ \to\ \text{negative side}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A hyperplane only draws the boundary; classification needs a <strong>rule for which side a point is on</strong>. That rule is just the sign of the hyperplane expression — turning geometry into a yes/no decision, the core of linear classifiers.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>On the boundary, $\mathbf w\cdot\mathbf x+w_0=0$. Step to one side and the value becomes <strong>positive</strong>; step to the other side and it becomes <strong>negative</strong>. These two regions are the <strong>half-spaces</strong>. So you plug a point in: positive → predict the positive class, negative → the negative class. The further from zero, the further from the boundary (and the more confident the call).</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf w\cdot\mathbf x$</span><div class="tdef"><div class="tname">Dot product</div><div class="ttext">Position of the point along the normal direction.</div><div class="tfind"><b>find it</b> $\sum w_i x_i$</div></div></div>
+        <div class="term"><span class="sym">$w_0$</span><div class="tdef"><div class="tname">Bias term</div><div class="ttext">Same role as $b$ — shifts the boundary.</div></div></div>
+        <div class="term"><span class="sym txt">sign</span><div class="tdef"><div class="tname">Positive or negative</div><div class="ttext">Tells you the half-space, hence the predicted class.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Boundary $x_1+x_2-2=0$; test point $(3,1)$.</p>
+        <p class="step"><b>1</b> $3+1-2=2>0$ → positive half-space.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISTANCE -->
+  <section class="fd" id="distance">
+    <div class="fd-head"><span class="fd-num">L16</span><h3 class="fd-title">Distance to a Plane</h3></div>
+    <p class="fd-sub">How far a point sits from the boundary — including from the origin.</p>
+
+    <div class="fbig"><div class="fname">General &amp; origin distance</div>$$d=\frac{|\mathbf{w}^{T}\mathbf{x}_0+b|}{\|\mathbf{w}\|}\qquad d_{\text{origin}}=\frac{|w_0|}{\|\mathbf{w}\|}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>How confidently a point belongs to its class depends on <strong>how far it is from the boundary</strong>. The distance is what SVMs maximize (the "margin"), and the special case from the origin is a common quick computation.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Plug the point into the plane expression: $\mathbf w^T\mathbf x_0+b$. This is zero on the plane and grows as you move away — but it's also inflated by how long $\mathbf w$ is. <strong>Divide by $\|\mathbf w\|$</strong> to strip out that scaling and recover the true perpendicular distance. The <strong>absolute value</strong> keeps it positive regardless of side.</p>
+      <p>For the distance <strong>from the origin</strong>, set $\mathbf x_0=\mathbf 0$: the $\mathbf w^T\mathbf x_0$ term vanishes, leaving just $\dfrac{|w_0|}{\|\mathbf w\|}$ (here $w_0$ is the bias term).</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf x_0$</span><div class="tdef"><div class="tname">The point</div><div class="ttext">What you measure from (the origin in the special case).</div></div></div>
+        <div class="term"><span class="sym">$w_0,b$</span><div class="tdef"><div class="tname">Bias term</div><div class="ttext">The plane's offset (two names for the same role).</div></div></div>
+        <div class="term"><span class="sym">$\|\mathbf w\|$</span><div class="tdef"><div class="tname">Length of the normal</div><div class="ttext">Normalizes the value into a real distance.</div><div class="tfind"><b>find it</b> $\sqrt{\sum w_i^2}$</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Plane $3x+4y-10=0$; distance from origin.</p>
+        <p class="step"><b>1</b> $\|\mathbf w\|=\sqrt{3^2+4^2}=5$, $|w_0|=10$.</p>
+        <p class="step"><b>2</b> $d=\frac{10}{5}=2$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DOT -->
+  <section class="fd" id="dot">
+    <div class="fd-head"><span class="fd-num">L17</span><h3 class="fd-title">The Dot Product</h3></div>
+    <p class="fd-sub">Angle between vectors, and projection of one onto another.</p>
+
+    <div class="fbig"><div class="fname">Dot Product</div>$$\mathbf{a}^{T}\mathbf{b}=\sum_i a_ib_i=\|\mathbf{a}\|\,\|\mathbf{b}\|\cos\theta$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The dot product is a single number that tells you <strong>how aligned two vectors are</strong> — used to find the <strong>angle</strong> between them, to <strong>project</strong> one vector onto another, and to test for perpendicularity. It's the most-used operation across machine learning.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Two equal faces. The <strong>computational</strong> form $\sum a_ib_i$ ("multiply matching components, add") is easy to calculate. The <strong>geometric</strong> form $\|\mathbf a\|\|\mathbf b\|\cos\theta$ shows the meaning: the lengths multiplied, scaled by the cosine of the angle between them. Same direction ($\theta=0$) → large positive; <strong>perpendicular</strong> ($\theta=90°$, $\cos=0$) → <strong>zero</strong>; opposite → negative. Rearranging also gives the <strong>projection</strong> of $\mathbf a$ onto $\mathbf b$.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$a_i,b_i$</span><div class="tdef"><div class="tname">Matching components</div><div class="ttext">Pair the i-th entries.</div><div class="tfind"><b>find it</b> 1st with 1st, 2nd with 2nd…</div></div></div>
+        <div class="term"><span class="sym">$\theta$</span><div class="tdef"><div class="tname">Angle between them</div><div class="ttext">Recoverable from the dot product and the two lengths.</div></div></div>
+        <div class="term"><span class="sym">$\|\mathbf a\|$</span><div class="tdef"><div class="tname">Length of a</div><div class="ttext">$\sqrt{\sum a_i^2}$.</div></div></div>
+      </div>
+    </div>
+    <div class="callout key"><span class="ic">!</span><div><strong>Perpendicular test:</strong> $\mathbf a^T\mathbf b=0 \Leftrightarrow$ the vectors are orthogonal (at 90°). A guaranteed exam point.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\mathbf a=(2,3)$, $\mathbf b=(4,1)$.</p>
+        <p class="step"><b>1</b> $\mathbf a^T\mathbf b=2(4)+3(1)=11$ → positive → broadly aligned.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COSINE -->
+  <section class="fd" id="cosine">
+    <div class="fd-head"><span class="fd-num">L18</span><h3 class="fd-title">Cosine Similarity</h3></div>
+    <p class="fd-sub">Comparing vectors by direction alone — the engine behind AI embeddings.</p>
+
+    <div class="fbig"><div class="fname">Cosine Similarity</div>$$\cos\theta=\frac{\mathbf{a}\cdot\mathbf{b}}{\|\mathbf{a}\|\,\|\mathbf{b}\|}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Often only <strong>direction</strong> matters, not size. In AI, text is turned into vectors called <strong>embeddings</strong>; two passages on the same topic should count as similar even if one is far longer (a bigger vector). Cosine similarity ignores length and compares pure orientation — which is exactly how systems decide if two text chunks are related.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Take the geometric dot product $\mathbf a\cdot\mathbf b=\|\mathbf a\|\|\mathbf b\|\cos\theta$ and solve for $\cos\theta$ by dividing out both lengths. Dividing by the magnitudes <strong>normalizes</strong> the vectors to unit size, so what remains is only the cosine of the angle — a clean score from <strong>−1 (opposite) through 0 (unrelated) to +1 (same direction)</strong>, independent of how long the vectors are.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf a\cdot\mathbf b$</span><div class="tdef"><div class="tname">Dot product (top)</div><div class="ttext">Raw alignment.</div><div class="tfind"><b>find it</b> $\sum a_ib_i$ — see L17</div></div></div>
+        <div class="term"><span class="sym">$\|\mathbf a\|\|\mathbf b\|$</span><div class="tdef"><div class="tname">Product of lengths (bottom)</div><div class="ttext">Cancels out the magnitudes.</div><div class="tfind"><b>find it</b> $\|\mathbf a\|=\sqrt{\sum a_i^2}$ for each</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>Cosine distance</strong> $=1-\cos\theta$. Same direction → 0; perpendicular → 1. It's how "related" becomes a "how far apart" number.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\mathbf a=(1,0)$, $\mathbf b=(1,1)$.</p>
+        <p class="step"><b>1</b> Dot $=1$; lengths $1$ and $\sqrt2$.</p>
+        <p class="step"><b>2</b> $\cos\theta=\frac{1}{\sqrt2}\approx0.71$ → a 45° angle, fairly similar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART V ===================== -->
+  <div class="partbar"><div class="pn">Part V</div><h3>Advanced Operations &amp; Eigen-Theory</h3></div>
+
+  <!-- TRANSPOSE -->
+  <section class="fd" id="transpose">
+    <div class="fd-head"><span class="fd-num">L19</span><h3 class="fd-title">The Transpose</h3></div>
+    <p class="fd-sub">Flipping a matrix across its diagonal.</p>
+
+    <div class="fbig"><div class="fname">Transpose &amp; its key property</div>$$(A^{T})_{ij}=a_{ji}\qquad (AB)^{T}=B^{T}A^{T}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The transpose turns rows into columns, which is needed to write dot products as $\mathbf a^T\mathbf b$, to define <strong>symmetric matrices</strong> ($A=A^T$), and to build the covariance matrices and normal equations that show up throughout statistics and machine learning.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>You simply <strong>reflect the matrix across its main diagonal</strong>: the entry in row $i$, column $j$ moves to row $j$, column $i$. An $m\times n$ matrix becomes $n\times m$. The important rule is that transposing a product <strong>reverses the order</strong>: $(AB)^T=B^TA^T$ — like putting on socks then shoes, undoing reverses the sequence.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$A^{T}$</span><div class="tdef"><div class="tname">Transpose of A</div><div class="ttext">Rows and columns swapped.</div></div></div>
+        <div class="term"><span class="sym">$a_{ji}$</span><div class="tdef"><div class="tname">Swapped index</div><div class="ttext">What was at $(j,i)$ is now at $(i,j)$.</div><div class="tfind"><b>find it</b> reflect each entry across the diagonal</div></div></div>
+        <div class="term"><span class="sym txt">order</span><div class="tdef"><div class="tname">Reversal rule</div><div class="ttext">$(AB)^T=B^TA^T$ — the product order flips.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\begin{bmatrix}1&2&3\\4&5&6\end{bmatrix}^{T}=\begin{bmatrix}1&4\\2&5\\3&6\end{bmatrix}$ — a 2×3 becomes a 3×2.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EIGEN -->
+  <section class="fd" id="eigen">
+    <div class="fd-head"><span class="fd-num">L20</span><h3 class="fd-title">Eigenvalues &amp; Eigenvectors</h3></div>
+    <p class="fd-sub">The directions a matrix only stretches — found via the characteristic equation.</p>
+
+    <div class="fbig"><div class="fname">Eigen-equation → characteristic equation</div>$$A\mathbf{v}=\lambda\mathbf{v}\ \Longrightarrow\ \det(A-\lambda I)=0$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>When a matrix acts, most vectors get knocked off their direction. A special few — the <strong>eigenvectors</strong> — keep pointing the same way and merely get scaled by a factor $\lambda$. Those directions are the "natural axes" of a transformation and power <strong>PCA</strong> (directions of greatest variance), PageRank, and stability analysis.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>We want a non-zero $\mathbf v$ that the matrix only stretches: $A\mathbf v=\lambda\mathbf v$. Rearrange to $(A-\lambda I)\mathbf v=\mathbf 0$ (the identity $I$ lets us subtract the scalar $\lambda$ from the matrix). This says $(A-\lambda I)$ crushes a non-zero vector to zero — which a matrix can only do if it's <strong>singular</strong>, i.e. its <strong>determinant is 0</strong>. So solve the <strong>characteristic equation</strong> $\det(A-\lambda I)=0$ for the $\lambda$ values, then substitute each back to find its eigenvector.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\lambda$</span><div class="tdef"><div class="tname">Eigenvalue</div><div class="ttext">The stretch factor along an eigenvector.</div><div class="tfind"><b>find it</b> solve $\det(A-\lambda I)=0$</div></div></div>
+        <div class="term"><span class="sym">$\mathbf v$</span><div class="tdef"><div class="tname">Eigenvector</div><div class="ttext">The direction that's only scaled, never rotated.</div><div class="tfind"><b>find it</b> solve $(A-\lambda I)\mathbf v=\mathbf 0$ for each λ</div></div></div>
+        <div class="term"><span class="sym">$I$</span><div class="tdef"><div class="tname">Identity matrix</div><div class="ttext">Lets λ be subtracted along the diagonal.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$A=\begin{bmatrix}4&1\\2&3\end{bmatrix}$.</p>
+        <p class="step"><b>1</b> $\det(A-\lambda I)=(4-\lambda)(3-\lambda)-2=\lambda^2-7\lambda+10$.</p>
+        <p class="step"><b>2</b> $(\lambda-5)(\lambda-2)=0\Rightarrow\lambda=5,2$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRACE -->
+  <section class="fd" id="trace">
+    <div class="fd-head"><span class="fd-num">L21</span><h3 class="fd-title">Trace &amp; Determinant via Eigenvalues</h3></div>
+    <p class="fd-sub">Two free shortcuts that double as error checks.</p>
+
+    <div class="fbig"><div class="fname">Eigenvalue relations</div>$$\sum\lambda_i=\operatorname{trace}(A)\qquad \prod\lambda_i=\det(A)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>These two relations let you find or verify eigenvalues <strong>without fully solving</strong>, and they're the fastest way to <strong>catch arithmetic mistakes</strong> in an eigenvalue problem — if your eigenvalues don't add to the trace and multiply to the determinant, you slipped somewhere.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>The characteristic equation $\det(A-\lambda I)=0$ is a polynomial whose roots are the eigenvalues. By the standard relationship between a polynomial's roots and its coefficients, the <strong>sum of the roots</strong> equals the sum of the diagonal entries (the <strong>trace</strong>), and the <strong>product of the roots</strong> equals the constant term, which works out to the <strong>determinant</strong>. So both facts fall straight out of the characteristic polynomial.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\lambda_i$</span><div class="tdef"><div class="tname">The eigenvalues</div><div class="ttext">All the stretch factors of the matrix.</div></div></div>
+        <div class="term"><span class="sym txt">trace</span><div class="tdef"><div class="tname">Trace of A</div><div class="ttext">Sum of the main-diagonal entries.</div><div class="tfind"><b>find it</b> add the top-left-to-bottom-right entries</div></div></div>
+        <div class="term"><span class="sym">$\det A$</span><div class="tdef"><div class="tname">Determinant</div><div class="ttext">Equals the product of all eigenvalues.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>From L20, $A=\begin{bmatrix}4&1\\2&3\end{bmatrix}$ had $\lambda=5,2$.</p>
+        <p class="step"><b>1</b> Trace $=4+3=7=5+2$ ✓.</p>
+        <p class="step"><b>2</b> Det $=4(3)-1(2)=10=5\times2$ ✓.</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /wrap -->
+
+  <footer>
+    <div class="line"></div>
+    <p>Volume II of your study set — the full linear-algebra outline, every concept decoded the same way. Pair it with the course site and the formula decoder.</p>
+    <p style="margin-top:8px;opacity:.7;font-family:'JetBrains Mono',monospace;font-size:11.5px">Geometry first, then the algebra follows.</p>
+  </footer>
+</main>
+</div>
+
+<script>
+function renderMath(){
+  if(window.renderMathInElement){
+    renderMathInElement(document.body,{
+      delimiters:[
+        {left:"$$",right:"$$",display:true},
+        {left:"$",right:"$",display:false},
+        {left:"\\(",right:"\\)",display:false},
+        {left:"\\[",right:"\\]",display:true}
+      ],
+      throwOnError:false
+    });
+  }
+}
+window.addEventListener('load',renderMath);
+
+var sb=document.getElementById('sidebar'),mb=document.getElementById('menuBtn'),ov=document.getElementById('overlay');
+function toggleMenu(open){sb.classList.toggle('open',open);ov.classList.toggle('show',open);}
+mb.addEventListener('click',function(){toggleMenu(!sb.classList.contains('open'));});
+ov.addEventListener('click',function(){toggleMenu(false);});
+document.querySelectorAll('#sidebar nav a').forEach(function(a){
+  a.addEventListener('click',function(){if(window.innerWidth<=980)toggleMenu(false);});
+});
+
+var prog=document.getElementById('progress');
+function updateProgress(){var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';}
+window.addEventListener('scroll',updateProgress,{passive:true});
+window.addEventListener('resize',updateProgress);updateProgress();
+
+var links=Array.prototype.slice.call(document.querySelectorAll('#sidebar nav a'));
+var sections=links.map(function(l){return document.querySelector(l.getAttribute('href'));});
+function spy(){var pos=window.scrollY+140,current=-1;
+  for(var i=0;i<sections.length;i++){if(sections[i]&&sections[i].offsetTop<=pos)current=i;}
+  links.forEach(function(l){l.classList.remove('active');});
+  if(current>=0)links[current].classList.add('active');}
+window.addEventListener('scroll',spy,{passive:true});spy();
+
+var search=document.getElementById('search');
+search.addEventListener('input',function(){
+  var q=this.value.toLowerCase().trim();
+  links.forEach(function(l){
+    var match=l.textContent.toLowerCase().indexOf(q)>-1;
+    l.classList.toggle('nav-hide',q.length>0&&!match);
+  });
+  document.querySelectorAll('.nav-group').forEach(function(g){
+    var visible=g.querySelectorAll('nav a:not(.nav-hide)').length;
+    g.style.display=(q.length>0&&visible===0)?'none':'';
+  });
+});
+</script>
+</body>
+</html>

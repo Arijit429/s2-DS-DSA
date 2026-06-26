@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DSA — Bit Manipulation, Math, Hashing, Recursion & Searching</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+  :root{--bg:#0c0e14;--surface:#14161f;--surface2:#1b1e2a;--border:#262a3a;--accent:#00d9a3;--java:#f89820;--blue:#5b9bff;--purple:#a78bfa;--red:#ff6b6b;--text:#e8eaf2;--muted:#8b90a3;--dim:#5a5f72;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
+  code,pre{font-family:'JetBrains Mono',monospace;}
+  .layout{display:flex;}
+  .sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:24px 0;z-index:100;}
+  .sidebar::-webkit-scrollbar{width:6px;}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  .brand{padding:0 24px 20px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .brand-logo{font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:700;display:flex;align-items:center;gap:10px;}
+  .brand-logo .ico{color:var(--accent);}
+  .brand-sub{font-size:12px;color:var(--muted);margin-top:4px;}
+  .nav-group{padding:6px 24px 4px;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-top:8px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 24px;font-size:13.5px;font-weight:500;color:var(--muted);cursor:pointer;border-left:3px solid transparent;transition:all 0.15s;}
+  .nav-item:hover{color:var(--text);background:rgba(0,217,163,0.06);}
+  .nav-item.active{color:var(--accent);border-left-color:var(--accent);background:rgba(0,217,163,0.1);}
+  .nav-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--dim);min-width:20px;}
+  .nav-item.active .nav-num{color:var(--accent);}
+  .main{margin-left:260px;flex:1;max-width:calc(100% - 260px);}
+  .content{max-width:900px;margin:0 auto;padding:48px 40px 120px;}
+  .hero{padding:60px 40px;background:linear-gradient(135deg,rgba(0,217,163,0.07),rgba(91,155,255,0.04));border-bottom:1px solid var(--border);}
+  .hero-inner{max-width:900px;margin:0 auto;}
+  .hero h1{font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:700;line-height:1.1;margin-bottom:16px;letter-spacing:-1px;}
+  .hero h1 .hl{color:var(--accent);}
+  .hero h1 .hl2{color:var(--java);}
+  .hero h1 .hl3{color:var(--blue);}
+  .hero h1 .hl4{color:var(--purple);}
+  .hero h1 .hl5{color:var(--red);}
+  .hero p{font-size:16px;color:var(--muted);max-width:640px;}
+  .hero-stats{display:flex;gap:32px;margin-top:28px;flex-wrap:wrap;}
+  .hero-stat .n{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--accent);}
+  .hero-stat .l{font-size:13px;color:var(--muted);}
+  .module{display:none;}
+  .module.active{display:block;animation:fade 0.3s;}
+  @keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .module-head{margin-bottom:32px;padding-bottom:20px;border-bottom:1px solid var(--border);}
+  .module-eyebrow{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;}
+  .module-head h2{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;letter-spacing:-0.5px;}
+  .module-head p{color:var(--muted);margin-top:8px;font-size:15px;}
+  h3{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:600;margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+  h3 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;}
+  h4{font-size:16px;font-weight:600;margin:26px 0 10px;color:var(--text);}
+  p.body{color:#c4c8d4;margin-bottom:14px;font-size:15px;}
+  ul.points,ol.points{margin:0 0 16px 20px;}
+  ul.points li,ol.points li{color:#c4c8d4;margin-bottom:8px;font-size:15px;}
+  ul.points li strong,ol.points li strong{color:var(--text);}
+  pre.code{background:#0a0c12;border:1px solid var(--border);border-radius:10px;padding:18px 20px;overflow-x:auto;margin:16px 0;font-size:13.5px;line-height:1.75;}
+  pre.code::-webkit-scrollbar{height:8px;}
+  pre.code::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+  .code .kw{color:#ff9d5c;}
+  .code .ty{color:#649ad2;}
+  .code .st{color:#4ade80;}
+  .code .cm{color:#5a5f72;font-style:italic;}
+  .code .nm{color:#f8c555;}
+  .code .fn{color:#a78bfa;}
+  code.inline{background:var(--surface2);padding:2px 7px;border-radius:5px;font-size:13px;color:var(--accent);border:1px solid var(--border);}
+  .tbl{width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;}
+  .tbl th{background:var(--surface2);text-align:left;padding:10px 14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);border:1px solid var(--border);}
+  .tbl td{padding:10px 14px;border:1px solid var(--border);color:#c4c8d4;vertical-align:top;}
+  .tbl tr:nth-child(even) td{background:rgba(255,255,255,0.015);}
+  .keybox{background:linear-gradient(135deg,rgba(0,217,163,0.07),rgba(91,155,255,0.04));border:1px solid rgba(0,217,163,0.25);border-radius:12px;padding:18px 22px;margin:20px 0;}
+  .keybox .kb-title{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+  .keybox p,.keybox li{color:#c4c8d4;font-size:14.5px;}
+  .keybox ul{margin-left:18px;margin-top:6px;}
+  .keybox li{margin-bottom:5px;}
+  .warn{background:rgba(255,168,77,0.07);border:1px solid rgba(255,168,77,0.3);border-radius:12px;padding:16px 20px;margin:16px 0;font-size:14.5px;color:#e8c89a;}
+  .warn strong{color:#ffa94d;}
+  .formula{background:rgba(0,217,163,0.06);border:1px solid rgba(0,217,163,0.2);border-radius:10px;padding:14px 20px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:15px;color:#a8e8c0;}
+  .problem{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:26px;margin:24px 0;}
+  .prob-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+  .prob-title{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;}
+  .prob-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+  .badge{font-family:'JetBrains Mono',monospace;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;}
+  .badge.easy{background:rgba(74,222,128,0.15);color:#4ade80;}
+  .badge.med{background:rgba(255,168,77,0.15);color:#ffa94d;}
+  .badge.hard{background:rgba(255,107,107,0.15);color:#ff6b6b;}
+  .badge.lc{background:rgba(91,155,255,0.15);color:#5b9bff;}
+  .badge.gfg{background:rgba(0,217,163,0.15);color:var(--accent);}
+  .prob-desc{color:#c4c8d4;font-size:15px;margin-bottom:14px;}
+  .ex-box{background:var(--surface2);border-radius:8px;padding:12px 16px;margin:10px 0;font-family:'JetBrains Mono',monospace;font-size:13px;color:#a8b3c0;border-left:3px solid var(--border);}
+  .ex-box .lbl{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:4px;}
+  .approach-box{margin-top:14px;padding:16px 18px;background:var(--surface2);border-radius:10px;border-left:3px solid var(--accent);}
+  .approach-box .a-title{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+  .approach-box p{color:#c4c8d4;font-size:14.5px;}
+  .step-box{background:rgba(91,155,255,0.06);border:1px solid rgba(91,155,255,0.2);border-radius:10px;padding:14px 20px;margin:14px 0;}
+  .step-box .s-title{font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;}
+  .step-box p{color:#c4c8d4;font-size:14.5px;}
+  .info-box{background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.25);border-radius:12px;padding:16px 20px;margin:16px 0;}
+  .info-box .i-title{font-size:13px;font-weight:600;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .info-box p,.info-box li{color:#c4c8d4;font-size:14.5px;}
+  .info-box ul{margin-left:18px;margin-top:6px;}
+  .info-box li{margin-bottom:5px;}
+  .menu-btn{display:none;position:fixed;top:16px;left:16px;z-index:200;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);cursor:pointer;font-size:18px;}
+  @media(max-width:900px){
+    .sidebar{transform:translateX(-100%);transition:transform 0.3s;}
+    .sidebar.open{transform:translateX(0);}
+    .main{margin-left:0;max-width:100%;}
+    .menu-btn{display:block;}
+    .content{padding:70px 20px 80px;}
+    .hero{padding:70px 20px 40px;}
+    .hero h1{font-size:26px;}
+  }
+  .prog{position:fixed;top:0;left:260px;right:0;height:3px;background:var(--border);z-index:90;}
+  .prog-bar{height:100%;background:var(--accent);width:0%;transition:width 0.1s;}
+  @media(max-width:900px){.prog{left:0;}}
+</style>
+</head>
+<body>
+<button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+<div class="prog"><div class="prog-bar" id="progBar"></div></div>
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-logo"><span class="ico">&#8853;</span> DSA Notes</div>
+      <div class="brand-sub">Classes 31&#8211;57 &middot; Complete</div>
+    </div>
+    <div id="navList"></div>
+  </nav>
+  <main class="main">
+    <div class="hero">
+      <div class="hero-inner">
+        <h1>Bit Manip &amp; <span class="hl2">Math</span><br><span class="hl3">Hashing</span> &amp; <span class="hl4">Recursion</span> &amp; <span class="hl5">Searching</span></h1>
+        <p>Full coverage of Classes 31&#8211;57. Every concept from your notes, every LeetCode &amp; GFG problem solved in detail &#8212; nothing cut.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="n">9</div><div class="l">Modules</div></div>
+          <div class="hero-stat"><div class="n">55+</div><div class="l">Problems solved</div></div>
+          <div class="hero-stat"><div class="n">C++</div><div class="l">Code throughout</div></div>
+          <div class="hero-stat"><div class="n">57</div><div class="l">Classes covered</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </main>
+</div>
+<script>
+const MODULES = [
+{
+id:"m1",num:"01",title:"Number Systems & Binary Math",desc:"Decimal & binary systems, conversions, adding binary numbers, negative numbers, 2's complement, signed/unsigned ranges, datatype ranges, overflow.",
+html:`
+<h3><span class="dot"></span>Today's content (Class 31)</h3>
+<ul class="points">
+  <li>Number system basics</li><li>Binary to Decimal and vice versa</li><li>Adding 2 Binary Numbers</li><li>Negative numbers</li><li>Datatype Range</li><li>Multiplying 2 numbers</li>
+</ul>
+<h3><span class="dot"></span>Sum series — the foundation</h3>
+<div class="formula">S = 2⁰ + 2¹ + 2² + … + 2ᴺ = 2ᴺ⁺¹ − 1</div>
+<p class="body"><strong>Derivation:</strong> Let S = 2⁰+2¹+…+2ᴺ. Multiply both sides by 2: 2S = 2¹+2²+…+2ᴺ⁺¹. Subtract: S = 2ᴺ⁺¹ − 1.</p>
+<h3><span class="dot"></span>Decimal Number System</h3>
+<pre class="code"><span class="cm">// Positional representation — base 10</span>
+3 4 2   →   3×10² + 4×10¹ + 2×10⁰  = 342
+2 5 6 3 →   2×10³ + 5×10² + 6×10¹ + 3×10⁰ = 2563</pre>
+<h3><span class="dot"></span>Binary Number System</h3>
+<p class="body"><strong>Digits:</strong> {0,1} &nbsp; <strong>Base:</strong> 2. Leftmost = <strong>MSB</strong>, rightmost = <strong>LSB</strong>.</p>
+<pre class="code"><span class="cm">// Binary → Decimal</span>
+1 0 0 1 0 1  = 1×32 + 1×4 + 1×1 = 37
+<span class="cm">// Decimal → Binary (divide by 2, collect remainders bottom-to-top)</span>
+37: 37÷2=18R1  18÷2=9R0  9÷2=4R1  4÷2=2R0  2÷2=1R0  1÷2=0R1  → 100101 ✓</pre>
+<h3><span class="dot"></span>Adding 2 Binary Numbers</h3>
+<pre class="code"><span class="cm">// sum = d1+d2+carry_in.  digit = sum%2,  carry = sum/2</span>
+<span class="cm">// Add 22 (10110) + 7 (00111) = 29 (11101)</span>
+carry:    0  0  1  1  1  0
+  N1:     1  0  1  1  0  = 22
+  N2:     0  0  1  1  1  =  7
+ sum:     1  1  1  0  1  = 29  ✓</pre>
+<h3><span class="dot"></span>Two's Complement — Negative Numbers</h3>
+<div class="formula">−a = ~a + 1</div>
+<pre class="code"><span class="cm">// Get -13 in 8-bit two's complement</span>
+  a=13:  0 0 0 0 1 1 0 1
+     ~a: 1 1 1 1 0 0 1 0
+     +1: 1 1 1 1 0 0 1 1  = -13 ✓  (MSB weight = -128; -128+64+32+16+2+1 = -13)</pre>
+<div class="warn"><strong>Sign-bit problem:</strong> Naive sign-bit approach: −13+2 gives −15 instead of −11. Two's complement fixes ALL arithmetic. MSB weight is <strong>−2ᴺ⁻¹</strong> in signed representation.</div>
+<h3><span class="dot"></span>Ranges</h3>
+<table class="tbl">
+  <tr><th>#bits</th><th>Signed Min</th><th>Signed Max</th><th>Unsigned Max</th></tr>
+  <tr><td>8</td><td>−128</td><td>127</td><td>255</td></tr>
+  <tr><td>32</td><td>−2³¹ ≈ −2×10⁹</td><td>2³¹−1 ≈ 2×10⁹</td><td>2³²−1 ≈ 4×10⁹</td></tr>
+  <tr><td>64</td><td>−2⁶³ ≈ −8×10¹⁸</td><td>2⁶³−1 ≈ 8×10¹⁸</td><td>—</td></tr>
+</table>
+<h3><span class="dot"></span>Signed vs Unsigned</h3>
+<ul class="points">
+  <li><strong>Unsigned type:</strong> MSB weight is positive</li>
+  <li><strong>Signed type:</strong> MSB weight is negative (default in C/C++/Java)</li>
+  <li><em>Note 1:</em> By default any variable we declare is signed</li>
+  <li><em>Note 2:</em> In Java we only have signed</li>
+</ul>
+<h4>Range formulas</h4>
+<table class="tbl">
+  <tr><th>#bits</th><th>Signed Min</th><th>Signed Max</th><th>Unsigned Max</th></tr>
+  <tr><td>4</td><td>−2³ = −8</td><td>2³−1 = 7</td><td>2⁴−1 = 15</td></tr>
+  <tr><td>8</td><td>−2⁷ = −128</td><td>2⁷−1 = 127</td><td>2⁸−1 = 255</td></tr>
+  <tr><td>N</td><td>−2ᴺ⁻¹</td><td>2ᴺ⁻¹−1</td><td>2ᴺ−1</td></tr>
+</table>
+<h3><span class="dot"></span>Datatype Ranges</h3>
+<table class="tbl">
+  <tr><th>Datatype</th><th>Bits</th><th>Signed Range</th></tr>
+  <tr><td>byte</td><td>8</td><td>[−128, 127]</td></tr>
+  <tr><td>int</td><td>32</td><td>[−2³¹, 2³¹−1] ≈ [−2×10⁹, 2×10⁹]</td></tr>
+  <tr><td>long</td><td>64</td><td>[−2⁶³, 2⁶³−1] ≈ [−8×10¹⁸, 8×10¹⁸]</td></tr>
+</table>
+<h4>Approximations (memorize — from notes)</h4>
+<div class="formula">2¹⁰ = 1024 ≈ 1000 = 10³  →  2¹⁰ ≈ 10³</div>
+<pre class="code"><span class="cm">// (2¹⁰)³ ≈ (10³)³  →  2³⁰ ≈ 10⁹</span>
+<span class="cm">// 2×2³⁰ ≈ 2×10⁹  →  2³¹ ≈ 2×10⁹   (int max)</span>
+<span class="cm">// (2¹⁰)⁶ ≈ (10³)⁶  →  2⁶⁰ ≈ 10¹⁸</span>
+<span class="cm">// 8×2⁶⁰ ≈ 8×10¹⁸  →  2⁶³ ≈ 8×10¹⁸   (long max)</span></pre>
+<h3><span class="dot"></span>Multiplying 2 Numbers — Overflow Examples</h3>
+<pre class="code"><span class="cm">// Problem 1: int × int → overflow</span>
+<span class="ty">int</span> a = 1e5, b = 1e6;
+<span class="ty">int</span> c = a * b;           <span class="cm">// 10¹¹ overflows int → garbage ✗</span>
+
+<span class="cm">// Problem 2: long c = a*b (a,b still int) → STILL OVERFLOWS</span>
+<span class="ty">long long</span> c = a * b;     <span class="cm">// multiply as int first in ALU → overflow THEN store ✗</span>
+
+<span class="cm">// Problem 3: cast one to long BEFORE multiply ✓</span>
+<span class="ty">long long</span> c = (<span class="ty">long long</span>)a * b;   <span class="cm">// promotes b to long → 10¹¹ fits ✓</span>
+
+<span class="cm">// Problem 4: declare both as long from start ✓</span>
+<span class="ty">long long</span> a = 1e5, b = 1e6;
+<span class="ty">long long</span> c = a * b;     <span class="cm">// 10¹¹ stored correctly ✓</span></pre>
+<div class="warn"><strong>Rule from class:</strong> When multiplying int × int, there might be overflow. Cast one of them to long BEFORE the multiply: <code>(long long)a * b</code>.</div>
+`
+},
+{
+id:"m2",num:"02",title:"Bitwise Operators, Shifts & Bit Problems",desc:"Classes 32–33: AND OR XOR NOT truth tables, 9 interesting properties, left/right shifts, set/check/clear/count bits — with every class problem solved.",
+html:`
+<h3><span class="dot"></span>Today's content (Classes 32–33)</h3>
+<ul class="points">
+  <li>Bitwise Operators: AND, OR, XOR, NOT, Left Shift, Right Shift</li>
+  <li>Interesting Properties (9)</li>
+  <li>Problems using Left and Right Shift</li>
+</ul>
+<h3><span class="dot"></span>Truth Tables</h3>
+<table class="tbl">
+  <tr><th>A</th><th>B</th><th>A&amp;B</th><th>A|B</th><th>A^B</th><th>~A</th></tr>
+  <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+  <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+  <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+  <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+</table>
+<p class="body"><em>XOR mnemonic from class: "same same puppy share" — same bits → 0, different → 1.</em></p>
+<h4>Worked examples from notes</h4>
+<pre class="code"><span class="cm">// a=29, b=19</span>
+       2⁴  2³  2²  2¹  2⁰
+a=29:   1   1   1   0   1
+b=19:   1   0   0   1   1
+a&amp;b:    1   0   0   0   1  = 17
+a|b:    1   1   1   1   1  = 31
+a^b:    0   1   1   1   0  = 14
+
+<span class="cm">// a=20, b=45</span>
+       2⁵  2⁴  2³  2²  2¹  2⁰
+a=20:   0   1   0   1   0   0
+b=45:   1   0   1   1   0   1
+a&amp;b:    0   0   0   1   0   0  = 4
+a|b:    1   1   1   1   0   1  = 61
+a^b:    1   1   1   0   0   1  = 57</pre>
+<h3><span class="dot"></span>9 Interesting Bitwise Properties</h3>
+<table class="tbl">
+  <tr><th>#</th><th>Property</th><th>Meaning</th></tr>
+  <tr><td>1</td><td><code class="inline">A &amp; 1</code></td><td>0 if even, 1 if odd (0th bit = parity)</td></tr>
+  <tr><td>2</td><td><code class="inline">A &amp; 0 = 0</code></td><td>AND with 0 zeroes everything</td></tr>
+  <tr><td>3</td><td><code class="inline">A &amp; A = A</code></td><td>AND with itself unchanged</td></tr>
+  <tr><td>4</td><td><code class="inline">A | 1</code></td><td>A if odd, A+1 if even (sets 0th bit)</td></tr>
+  <tr><td>5</td><td><code class="inline">A | 0 = A</code></td><td>OR with 0 unchanged</td></tr>
+  <tr><td>6</td><td><code class="inline">A | A = A</code></td><td>OR with itself unchanged</td></tr>
+  <tr><td>7</td><td><code class="inline">A ^ 1</code></td><td>toggles 0th bit</td></tr>
+  <tr><td>8</td><td><code class="inline">A ^ 0 = A</code></td><td>XOR with 0 unchanged</td></tr>
+  <tr><td>9</td><td><code class="inline">A ^ A = 0</code></td><td>XOR with itself = 0 ← most important!</td></tr>
+</table>
+<pre class="code"><span class="cm">// XOR example: a^b^a^d^b = (a^a)^(b^b)^d = 0^0^d = d</span>
+<span class="cm">// 1^3^5^3^2^1^5 = (1^1)^(3^3)^(5^5)^2 = 2</span></pre>
+<h4>Verification with A=10=1010 (from notes)</h4>
+<pre class="code">A&amp;0 = 1010&amp;0000 = 0000 = 0   <span class="cm">// Property 2 ✓</span>
+A&amp;A = 1010&amp;1010 = 1010 = 10  <span class="cm">// Property 3 ✓</span>
+A^0 = 1010^0000 = 1010 = 10  <span class="cm">// Property 8 ✓</span>
+A^A = 1010^1010 = 0000 = 0   <span class="cm">// Property 9 ✓</span></pre>
+<h4>Commutative &amp; Associative</h4>
+<ul class="points">
+  <li><strong>Commutative:</strong> A&amp;B=B&amp;A &nbsp;|&nbsp; A|B=B|A &nbsp;|&nbsp; A^B=B^A</li>
+  <li><strong>Associative:</strong> (A&amp;B)&amp;C = A&amp;(B&amp;C) &nbsp;|&nbsp; A^B^C = any reorder</li>
+</ul>
+<h3><span class="dot"></span>Left Shift &amp; Right Shift</h3>
+<div class="keybox">
+  <div class="kb-title">◆ Key Rules</div>
+  <p><code>a &lt;&lt; n = a × 2ⁿ</code> &nbsp;&nbsp; <code>1 &lt;&lt; n = 2ⁿ</code> (put set-bit at position n)</p>
+  <p><code>a &gt;&gt; n = a / 2ⁿ</code> (floor division) &nbsp;&nbsp; Negative: MSB replicated (sign extension)</p>
+</div>
+<pre class="code"><span class="cm">// Left shift overflow trap: a=10 (8-bit signed)</span>
+a&lt;&lt;1=20  a&lt;&lt;2=40  a&lt;&lt;3=80  a&lt;&lt;4=-96  <span class="cm">← overflow! 160 &gt; 127</span>
+
+<span class="cm">// Right shift floor division: a=20</span>
+a&gt;&gt;1=10  a&gt;&gt;2=5  a&gt;&gt;3=2(floor)  a&gt;&gt;5=0
+<span class="cm">// Negative: MSB retained — a=-20: a&gt;&gt;1=-10  a&gt;&gt;2=-5</span>
+
+<span class="cm">// Set i-th bit — N=41=101001, i=2 → expected 45</span>
+N=41:      0 0 1 0 1 0 0 1
+1&lt;&lt;2:      0 0 0 0 0 1 0 0
+N|(1&lt;&lt;2):  0 0 1 0 1 1 0 1  = 45 ✓
+N = N | (1 &lt;&lt; i);
+
+<span class="cm">// Check i-th bit — N=45=101101</span>
+(N&gt;&gt;0)&amp;1=1  (N&gt;&gt;2)&amp;1=0  (N&gt;&gt;3)&amp;1=1
+<span class="cm">// Way 1: (N >> i) & 1 == 1</span>
+<span class="cm">// Way 2: (N & (1 &lt;&lt; i)) != 0</span>
+
+<span class="cm">// Clear i-th bit</span>
+N = N &amp; ~(1 &lt;&lt; i);   <span class="cm">// ~(1&lt;&lt;i): 0 only at bit i</span>
+<span class="cm">// Toggle i-th bit</span>
+N = N ^ (1 &lt;&lt; i);    <span class="cm">// 0^1=1, 1^1=0</span></pre>
+<h3><span class="dot"></span>Count Set Bits — 3 approaches</h3>
+<pre class="code"><span class="cm">// Idea 1: iterate all 32 positions — O(32)</span>
+<span class="ty">int</span> <span class="fn">count1</span>(<span class="ty">int</span> N){<span class="ty">int</span> c=0;<span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;32;i++)<span class="kw">if</span>((N&gt;&gt;i)&amp;1)c++;<span class="kw">return</span> c;}
+
+<span class="cm">// Idea 2: shift N until 0 — O(bits). BUG: must write N=N>>1 not just N>>1!</span>
+<span class="ty">int</span> <span class="fn">count2</span>(<span class="ty">int</span> N){<span class="ty">int</span> c=0;<span class="kw">while</span>(N){<span class="kw">if</span>(N&amp;1)c++;N=N&gt;&gt;1;}<span class="kw">return</span> c;}
+
+<span class="cm">// Idea 3: Brian Kernighan — N&(N-1) removes LOWEST set bit — O(set bits)</span>
+<span class="ty">int</span> <span class="fn">count3</span>(<span class="ty">int</span> N){<span class="ty">int</span> c=0;<span class="kw">while</span>(N){N=N&amp;(N-1);c++;}<span class="kw">return</span> c;}
+<span class="cm">// N=45=101101: 101100→101000→100000→000000  → 4 set bits ✓</span></pre>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 231 — Power of Two</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+  <div class="prob-desc">Power of 2 has exactly one set bit → N&(N-1)==0</div>
+<pre class="code"><span class="ty">bool</span> <span class="fn">isPowerOfTwo</span>(<span class="ty">int</span> n){<span class="kw">return</span> n&gt;0 &amp;&amp; (n&amp;(n-1))==0;}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 191 — Number of 1 Bits</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">int</span> <span class="fn">hammingWeight</span>(<span class="ty">int</span> n){<span class="ty">int</span> c=0;<span class="kw">while</span>(n){n=n&amp;(n-1);c++;}<span class="kw">return</span> c;}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 338 — Counting Bits</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; <span class="fn">countBits</span>(<span class="ty">int</span> n){
+    <span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; ans(n+1,0);
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;=n;i++) ans[i]=ans[i&gt;&gt;1]+(i&amp;1);  <span class="cm">// ans[i]=ans[i/2]+LSB</span>
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 461 — Hamming Distance</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">int</span> <span class="fn">hammingDistance</span>(<span class="ty">int</span> x,<span class="ty">int</span> y){<span class="ty">int</span> z=x^y,c=0;<span class="kw">while</span>(z){z&amp;=z-1;c++;}<span class="kw">return</span> c;}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 190 — Reverse Bits</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">uint32_t</span> <span class="fn">reverseBits</span>(<span class="ty">uint32_t</span> n){
+    <span class="ty">uint32_t</span> ans=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;32;i++){ans|=((n&gt;&gt;i)&amp;1)&lt;&lt;(31-i);}
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 201 — Bitwise AND of Numbers Range</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Find common prefix by right-shifting until equal, then shift back.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">rangeBitwiseAnd</span>(<span class="ty">int</span> l,<span class="ty">int</span> r){
+    <span class="ty">int</span> s=0;
+    <span class="kw">while</span>(l!=r){l&gt;&gt;=1;r&gt;&gt;=1;s++;}
+    <span class="kw">return</span> l&lt;&lt;s;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 371 — Sum of Two Integers (no + or −)</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">XOR = sum without carry; (a&amp;b)&lt;&lt;1 = carry bits. Repeat until carry=0.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">getSum</span>(<span class="ty">int</span> a,<span class="ty">int</span> b){
+    <span class="kw">while</span>(b){<span class="ty">unsigned</span> c=((<span class="ty">unsigned</span>)(a&amp;b))&lt;&lt;1;a=a^b;b=c;}
+    <span class="kw">return</span> a;
+}</pre>
+</div>
+`
+},
+{
+id:"m3",num:"03",title:"XOR Problems — Single Number Variants",desc:"Classes 33–35: unique element when others repeat 2× or 3×, two unique elements, missing & repeating, subsets/subsequences definitions, bitmask enumeration.",
+html:`
+<h3><span class="dot"></span>Today's content (Classes 33–35)</h3>
+<ul class="points">
+  <li>Single Number I (every element repeats twice except one)</li>
+  <li>Single Number II (every element repeats thrice except one)</li>
+  <li>Single Number III (two unique elements, rest repeat twice)</li>
+  <li>Missing &amp; Repeating Elements</li>
+  <li>Subsets / Subsequences — definitions &amp; bitmask enumeration</li>
+</ul>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 136 — Single Number I</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+  <div class="prob-desc">All elements repeat twice except one. XOR all → pairs cancel (a^a=0), unique survives.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">singleNumber</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){
+    <span class="ty">int</span> ans=0;
+    <span class="kw">for</span>(<span class="ty">int</span> x:arr) ans^=x;
+    <span class="kw">return</span> ans;
+}
+<span class="cm">// [1,3,5,3,2,1,5]: (1^1)^(3^3)^(5^5)^2 = 2 ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 137 — Single Number II (repeats 3×)</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">For each bit position: count set bits across all elements. count%3==1 → unique element has that bit.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">singleNumberII</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(32N), SC: O(1)</span>
+    <span class="ty">int</span> N=arr.size(),unq=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;32;i++){
+        <span class="ty">int</span> c=0;
+        <span class="kw">for</span>(<span class="ty">int</span> j=0;j&lt;N;j++) <span class="kw">if</span>((arr[j]&gt;&gt;i)&amp;1) c++;
+        <span class="kw">if</span>(c%3==1) unq|=(1&lt;&lt;i);
+    }
+    <span class="kw">return</span> unq;
+}
+<span class="cm">// Generalized: for K-repeats-except-one, use c%K==1</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 260 — Single Number III (two unique elements)</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">XOR all → val = a^b. Find any set bit p (a and b differ there). Split array by bit p → each group has one unique → apply Single Number I.</div>
+<pre class="code"><span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; <span class="fn">singleNumberIII</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(N), SC: O(1)</span>
+    <span class="ty">int</span> val=0;
+    <span class="kw">for</span>(<span class="ty">int</span> x:arr) val^=x;  <span class="cm">// val = a^b</span>
+    <span class="ty">int</span> p=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;32;i++){<span class="kw">if</span>((val&gt;&gt;i)&amp;1){p=i;<span class="kw">break</span>;}}
+    <span class="ty">int</span> a=0,b=0;
+    <span class="kw">for</span>(<span class="ty">int</span> x:arr)((x&gt;&gt;p)&amp;1)?(a^=x):(b^=x);
+    <span class="kw">return</span> {a,b};
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Missing and Repeating Elements</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">arr[N] has values from 1..N with exactly one repeating and one missing. XOR arr[] with 1..N → missing^repeating (normal elements cancel). Then apply Single Number III split.</div>
+<pre class="code"><span class="ty">pair</span>&lt;<span class="ty">int</span>,<span class="ty">int</span>&gt; <span class="fn">missRep</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(N), SC: O(1)</span>
+    <span class="ty">int</span> N=arr.size(),x=0;
+    <span class="kw">for</span>(<span class="ty">int</span> v:arr) x^=v;
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;=N;i++) x^=i;      <span class="cm">// x = missing ^ repeating</span>
+    <span class="ty">int</span> p=0;
+    <span class="kw">while</span>(((x&gt;&gt;p)&amp;1)==0) p++;
+    <span class="ty">int</span> a=0,b=0;
+    <span class="kw">for</span>(<span class="ty">int</span> v:arr)((v&gt;&gt;p)&amp;1)?(a^=v):(b^=v);
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;=N;i++)((i&gt;&gt;p)&amp;1)?(a^=i):(b^=i);
+    <span class="kw">for</span>(<span class="ty">int</span> v:arr) <span class="kw">if</span>(v==a) <span class="kw">return</span> {b,a};
+    <span class="kw">return</span> {a,b};
+}</pre>
+</div>
+
+<h3><span class="dot"></span>Subarray vs Subsequence vs Subset</h3>
+<table class="tbl">
+  <tr><th>Term</th><th>Definition</th><th>Count (arr[N])</th></tr>
+  <tr><td><strong>Subarray</strong></td><td>Continuous part, positional order</td><td>N(N+1)/2</td></tr>
+  <tr><td><strong>Subsequence</strong></td><td>Any elements in increasing index order</td><td>2ᴺ</td></tr>
+  <tr><td><strong>Subset</strong></td><td>Any elements, order doesn't matter (data only)</td><td>2ᴺ (distinct)</td></tr>
+</table>
+<div class="keybox">
+  <div class="kb-title">◆ Bitmask Enumeration — generate all 2ᴺ subsequences</div>
+  <p>Integer i from 0 to 2ᴺ−1 represents one subsequence. Bit j of i tells whether arr[j] is included.</p>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Subsequence with Sum = K (no extra space)</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">N≤20. Brute loops miss 2ᴺ cases (only check N² or N³). Enumerate all 2ᴺ bitmasks.</div>
+<pre class="code"><span class="ty">bool</span> <span class="fn">checkSum</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){  <span class="cm">// TC: O(2ᴺ×N), SC: O(1)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;(1&lt;&lt;N);i++){
+        <span class="ty">int</span> sum=0;
+        <span class="kw">for</span>(<span class="ty">int</span> j=0;j&lt;N;j++) <span class="kw">if</span>((i&gt;&gt;j)&amp;1) sum+=arr[j];
+        <span class="kw">if</span>(sum==k) <span class="kw">return</span> <span class="kw">true</span>;
+    }
+    <span class="kw">return</span> <span class="kw">false</span>;
+}
+<span class="cm">// N=20: 2²⁰×20 = 10⁶×20 = 2×10⁷ &lt;&lt; 10⁸ ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 78 — Subsets</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+<pre class="code"><span class="ty">vector</span>&lt;<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&gt; <span class="fn">subsets</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums){
+    <span class="ty">int</span> N=nums.size();
+    <span class="ty">vector</span>&lt;<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&gt; ans;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;(1&lt;&lt;N);i++){
+        <span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; sub;
+        <span class="kw">for</span>(<span class="ty">int</span> j=0;j&lt;N;j++) <span class="kw">if</span>((i&gt;&gt;j)&amp;1) sub.push_back(nums[j]);
+        ans.push_back(sub);
+    }
+    <span class="kw">return</span> ans;
+}  <span class="cm">// TC: O(2ᴺ×N)</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 268 — Missing Number</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">int</span> <span class="fn">missingNumber</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums){
+    <span class="ty">int</span> n=nums.size(),x=n;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;n;i++) x^=i^nums[i];
+    <span class="kw">return</span> x;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 421 — Maximum XOR of Two Numbers</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Greedy bit-by-bit from MSB. Use identity: if a^b=c then a^c=b.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">findMaximumXOR</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums){  <span class="cm">// TC: O(32N)</span>
+    <span class="ty">int</span> ans=0,mask=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=31;i&gt;=0;i--){
+        mask|=(1&lt;&lt;i);
+        unordered_set&lt;<span class="ty">int</span>&gt; pref;
+        <span class="kw">for</span>(<span class="ty">int</span> x:nums) pref.insert(x&amp;mask);
+        <span class="ty">int</span> cand=ans|(1&lt;&lt;i);
+        <span class="kw">for</span>(<span class="ty">int</span> p:pref) <span class="kw">if</span>(pref.count(cand^p)){ans=cand;<span class="kw">break</span>;}
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+`
+},
+{
+id:"m4",num:"04",title:"Modular Arithmetic",desc:"Classes 36–38: 8 properties with proofs, negative modulo trap, divisibility rule of 3, sum with %M, 2ᴺ%p, in-place rearrangement, frequency count O(1) space, largest subset.",
+html:`
+<h3><span class="dot"></span>Today's content (Classes 36–38)</h3>
+<ul class="points">
+  <li>Modular Arithmetic introduction &amp; 8 properties</li>
+  <li>Divisibility rule of 3 derivation</li>
+  <li>Problems: Sum with %M, 2ᴺ using %, Re-arrange array, Count frequency, Largest subset</li>
+</ul>
+<h3><span class="dot"></span>8 Properties of Modular Arithmetic</h3>
+<div class="formula">(a+b)%M = (a%M + b%M)%M</div>
+<div class="formula">(a%M)%M = a%M</div>
+<div class="formula">(a+M)%M = a%M</div>
+<div class="formula">(a−b)%M = (a%M − b%M + M)%M</div>
+<div class="formula">(a×b)%M = (a%M × b%M)%M</div>
+<div class="formula">(aᵖ)%M = (a%M)ᵖ%M</div>
+<div class="warn"><strong>Negative modulo in C++/Java:</strong> (-5)%7 = -5 (sign of dividend), NOT 2!<br>Fix: <code>(a%M + M) % M</code> always gives {0..M-1}.</div>
+<h4>Worked example: (37¹⁰³ − 1) % 12</h4>
+<pre class="code">= (37¹⁰³%12 − 1 + 12) % 12
+= ((37%12)¹⁰³%12 − 1 + 12) % 12
+= (1¹⁰³%12 − 1 + 12) % 12   <span class="cm">// 37%12=1</span>
+= 12 % 12 = 0</pre>
+<h3><span class="dot"></span>Divisibility Rule of 3 — derived from modular properties</h3>
+<pre class="code"><span class="cm">// X = X₃X₂X₁X₀.  KEY: 10ᵏ%3=1 for ALL k</span>
+X%3 = (X₃×1 + X₂×1 + X₁×1 + X₀×1)%3 = (sum of digits)%3
+<span class="cm">// X divisible by 3 ⟺ digit sum divisible by 3 ✓</span></pre>
+
+<h3><span class="dot"></span>A == B mod M — How many M? (from notes)</h3>
+<pre class="code"><span class="cm">// Given A, B (A&gt;B): find number of M such that A%M = B%M</span>
+<span class="cm">// A%M = B%M  ⟹  (A-B)%M = 0  ⟹  M divides (A-B)</span>
+<span class="cm">// Answer = number of divisors of (A-B)</span>
+<span class="cm">// Example A=16, B=4: A-B=12, divisors={1,2,3,4,6,12} → 6 values of M</span></pre>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Sum of Array Elements Modulo M</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge easy">Easy</span></div></div>
+  <div class="prob-desc">arr[N], return sum % (10⁹+7). N≤10⁵, −10¹⁶≤arr[i]≤10¹⁶. Naive overflows (min sum = −10²¹).</div>
+<pre class="code"><span class="ty">long long</span> <span class="fn">sumSafe</span>(<span class="ty">vector</span>&lt;<span class="ty">long long</span>&gt;&amp; arr){  <span class="cm">// TC: O(N), SC: O(1)</span>
+    <span class="ty">long long</span> M=1e9+7,s=0;
+    <span class="kw">for</span>(<span class="ty">long long</span> x:arr) s=((s%M)+(x%M)+M)%M;  <span class="cm">// +M handles negative</span>
+    <span class="kw">return</span> s;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — 2ᴺ % M</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">long long</span> <span class="fn">pow2</span>(<span class="ty">int</span> N){
+    <span class="ty">long long</span> ans=1,M=1e9+7;
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;=N;i++) ans=(ans*2)%M;
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Re-arrange Array: arr[i] = arr[arr[i]] — O(1) space</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Quotient/Remainder trick: encode old as quotient, new as remainder. arr[i]*=N stores old. arr[i]+=new. arr[i]/=N extracts new.</div>
+<pre class="code"><span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; <span class="fn">rearrange</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(N), SC: O(1)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;N;i++) arr[i]*=N;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;N;i++) arr[i]+=arr[arr[i]/N]/N;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;N;i++) arr[i]/=N;
+    <span class="kw">return</span> arr;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Count Frequency O(1) Space</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">arr[N], 0≤arr[i]&lt;N. Count freq of each value without extra space. Same trick: arr[idx]+=N increments freq. arr[i]/N = freq of value i. Always use arr[i]%N to get original value!</div>
+<pre class="code"><span class="kw">void</span> <span class="fn">printOcc</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(N), SC: O(1)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;N;i++) arr[arr[i]%N]+=N;  <span class="cm">// %N recovers original even after increment</span>
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;N;i++) cout&lt;&lt;"freq "&lt;&lt;i&lt;&lt;": "&lt;&lt;arr[i]/N&lt;&lt;endl;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Largest Subset Without a Pair Sum Divisible by M</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Group by remainder. Remainder r and M−r conflict (sum divisible by M). Pick larger group. Special: rem=0 → at most 1; rem=M/2 → at most 1.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">largestSubset</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> M){  <span class="cm">// TC: O(N+M)</span>
+    <span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; freq(M,0);
+    <span class="kw">for</span>(<span class="ty">int</span> x:arr) freq[x%M]++;
+    <span class="ty">int</span> ans=min(freq[0],1);
+    <span class="kw">for</span>(<span class="ty">int</span> r=1;r&lt;=M/2;r++){
+        <span class="kw">if</span>(r!=M-r) ans+=max(freq[r],freq[M-r]);
+        <span class="kw">else</span>       ans+=min(freq[r],1);
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">Fast Exponentiation — aᴺ % M (LeetCode 50 variant)</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+<pre class="code"><span class="ty">long long</span> <span class="fn">powMod</span>(<span class="ty">long long</span> a,<span class="ty">long long</span> b,<span class="ty">long long</span> M){  <span class="cm">// O(log b)</span>
+    <span class="ty">long long</span> ans=1;a%=M;
+    <span class="kw">while</span>(b&gt;0){<span class="kw">if</span>(b&amp;1)ans=(ans*a)%M;a=(a*a)%M;b&gt;&gt;=1;}
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+`
+},
+{
+id:"m5",num:"05",title:"Hashing — HashMap & HashSet Intro",desc:"Classes 41–42: Why hashing, O(1) operations vs O(N), HashMap/HashSet in C++/Java/Python, all operations with dry runs, frequency of queries.",
+html:`
+<h3><span class="dot"></span>Why HashMap? — Motivation (from notes)</h3>
+<p class="body">N student ids + marks, Q queries. Brute: O(Q×N) → for N=Q=10⁵: 10¹⁰ &gt;&gt; 10⁸ = TLE.</p>
+<table class="tbl">
+  <tr><th>Operation</th><th>Array/Vector</th><th>HashMap</th></tr>
+  <tr><td>Insert, Search, Update, Delete</td><td>O(N)</td><td>O(1) average</td></tr>
+</table>
+<h3><span class="dot"></span>HashMap Properties</h3>
+<ul class="points">
+  <li>Store data as {key, value} pairs</li>
+  <li>Keys are <strong>distinct</strong></li>
+  <li>Order of insertion <strong>NOT maintained</strong></li>
+</ul>
+<table class="tbl">
+  <tr><th>Language</th><th>Name</th><th>Declaration</th></tr>
+  <tr><td>C++</td><td>unordered_map</td><td><code class="inline">unordered_map&lt;K,V&gt; um;</code></td></tr>
+  <tr><td>Java</td><td>HashMap</td><td><code class="inline">HashMap&lt;K,V&gt; hm = new HashMap&lt;&gt;();</code></td></tr>
+  <tr><td>Python</td><td>dict</td><td><code class="inline">d = {}</code></td></tr>
+</table>
+<div class="keybox">
+  <div class="kb-title">◆ Key and Value types (from notes)</div>
+  <p><strong>C++ key-type:</strong> int / long / float / double / char / string / bool</p>
+  <p><strong>C++ value-type:</strong> Same + pair / vector / hashmap / class</p>
+  <p><strong>Java key-type:</strong> int→Integer, long→Long, char→Character, String→String, bool→Boolean</p>
+  <p><strong>Java value-type:</strong> Same + ArrayList / HashMap / class</p>
+</div>
+<h4>Design your hashmap type (from notes exercises)</h4>
+<pre class="code"><span class="cm">// Q1: Store population of every country</span>
+unordered_map&lt;<span class="ty">string</span>, <span class="ty">long</span>&gt; um;     <span class="cm">// key=CountryName, value=Population</span>
+
+<span class="cm">// Q2: Store no. of states of every country</span>
+unordered_map&lt;<span class="ty">string</span>, <span class="ty">int</span>&gt; um;
+
+<span class="cm">// Q3: Name of states of every country</span>
+unordered_map&lt;<span class="ty">string</span>, vector&lt;<span class="ty">string</span>&gt;&gt; um;
+
+<span class="cm">// Q4: Population of each state of every country (nested map)</span>
+unordered_map&lt;<span class="ty">string</span>, unordered_map&lt;<span class="ty">string</span>, <span class="ty">long</span>&gt;&gt; um;</pre>
+<h3><span class="dot"></span>All HashMap Operations</h3>
+<pre class="code"><span class="cm">// INSERT (two ways)</span>
+um[key] = value;
+um.insert({key, value});
+
+<span class="cm">// ACCESS — DANGER: um[key] for missing key INSERTS {key, default_value}!</span>
+<span class="cm">// Always check find() before reading with []</span>
+<span class="kw">if</span>(um.find(key)!=um.end()) cout&lt;&lt;um[key];  <span class="cm">// safe</span>
+
+<span class="cm">// UPDATE</span>
+um[key] = newVal;      <span class="cm">// override (inserts if absent)</span>
+um[key] += v;          <span class="cm">// increment (inserts {key,0} if absent, then adds v)</span>
+
+<span class="cm">// SEARCH</span>
+<span class="kw">if</span>(um.find(k)!=um.end()){ <span class="cm">/* found */</span> }
+
+<span class="cm">// DELETE — safe: does nothing if key not present</span>
+um.erase(key);
+
+<span class="cm">// SIZE + ITERATE</span>
+um.size();
+<span class="kw">for</span>(<span class="ty">auto</span> it=um.begin();it!=um.end();it++) cout&lt;&lt;it-&gt;first&lt;&lt;":"&lt;&lt;it-&gt;second;
+<span class="kw">for</span>(<span class="ty">auto</span> n:um) cout&lt;&lt;n.first&lt;&lt;":"&lt;&lt;n.second;</pre>
+<div class="warn"><strong>Critical Bug:</strong> <code>um[25]</code> where key 25 doesn't exist → auto-inserts {25, 0} into the map. Always use <code>um.find()</code> first when reading!</div>
+<h3><span class="dot"></span>HashSet Operations</h3>
+<pre class="code">unordered_set&lt;<span class="ty">int</span>&gt; us;
+us.insert(10);    <span class="cm">// if duplicate: does nothing</span>
+us.find(10)!=us.end();  <span class="cm">// search</span>
+us.erase(10);     <span class="cm">// safe if not present</span>
+us.size();        <span class="cm">// number of elements</span>
+<span class="kw">for</span>(<span class="ty">auto</span> n:us) cout&lt;&lt;n;</pre>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Frequency of Each Query</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Build freq map of arr[] once → O(N), answer each query in O(1).</div>
+<pre class="code"><span class="kw">void</span> <span class="fn">printFreq</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; query){  <span class="cm">// TC: O(N+Q)</span>
+    unordered_map&lt;<span class="ty">int</span>,<span class="ty">int</span>&gt; um;
+    <span class="kw">for</span>(<span class="ty">int</span> x:arr) um[x]++;   <span class="cm">// safe to use ++ when building freq map</span>
+    <span class="kw">for</span>(<span class="ty">int</span> q:query){
+        <span class="kw">if</span>(um.find(q)!=um.end()) cout&lt;&lt;um[q];
+        <span class="kw">else</span> cout&lt;&lt;0;
+        cout&lt;&lt;" ";
+    }
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 1 — Two Sum</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; <span class="fn">twoSum</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums,<span class="ty">int</span> target){
+    unordered_map&lt;<span class="ty">int</span>,<span class="ty">int</span>&gt; um;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;(<span class="ty">int</span>)nums.size();i++){
+        <span class="ty">int</span> comp=target-nums[i];
+        <span class="kw">if</span>(um.find(comp)!=um.end()) <span class="kw">return</span> {um[comp],i};
+        um[nums[i]]=i;
+    }
+    <span class="kw">return</span> {};
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 217 — Contains Duplicate</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+<pre class="code"><span class="ty">bool</span> <span class="fn">containsDuplicate</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){
+    unordered_set&lt;<span class="ty">int</span>&gt; us;
+    <span class="kw">for</span>(<span class="ty">int</span> x:arr) us.insert(x);
+    <span class="kw">return</span> us.size()!=arr.size();
+}</pre>
+</div>
+`
+},
+{
+id:"m6",num:"06",title:"Hashing — Advanced Subarray & Window Problems",desc:"Classes 43–44: Subarray sum=0, longest subarray sum=0, equal 1s & 0s, distinct elements in window, count pairs — prefix sum + hashmap master pattern.",
+html:`
+<div class="keybox">
+  <div class="kb-title">◆ Master Pattern: Subarray Sum → Prefix Array + HashMap</div>
+  <p>pf[i] repeated means subarray between those indices sums to 0. Pre-insert {0,−1} to handle subarrays starting at index 0. For max length: store FIRST occurrence, never update!</p>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Subarray with Zero Sum</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Pre-insert 0 in hashset. If pf[i] seen again → True.</div>
+<pre class="code"><span class="ty">bool</span> <span class="fn">isSub</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(N), SC: O(N)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="ty">vector</span>&lt;<span class="ty">long</span>&gt; pf(N);
+    pf[0]=arr[0];
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;N;i++) pf[i]=pf[i-1]+arr[i];
+    unordered_set&lt;<span class="ty">long</span>&gt; us;
+    us.insert(0);                <span class="cm">// handles subarray starting at 0</span>
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;N;i++){
+        <span class="kw">if</span>(us.find(pf[i])!=us.end()) <span class="kw">return</span> <span class="kw">true</span>;
+        us.insert(pf[i]);
+    }
+    <span class="kw">return</span> <span class="kw">false</span>;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Largest Subarray with Zero Sum</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Insert {0,−1}. When pf[i] seen again: len = i − hm[pf[i]]. DON'T update hm on repeat — keep first occurrence for max length!</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">maxLength</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(N), SC: O(N)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="ty">vector</span>&lt;<span class="ty">long</span>&gt; pf(N);
+    pf[0]=arr[0];
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;N;i++) pf[i]=pf[i-1]+arr[i];
+    unordered_map&lt;<span class="ty">long</span>,<span class="ty">int</span>&gt; hm;
+    hm[0]=-1;   <span class="cm">// pf==0 at i → subarray [0..i] sum=0, len = i-(-1) = i+1</span>
+    <span class="ty">int</span> ans=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;N;i++){
+        <span class="kw">if</span>(hm.find(pf[i])!=hm.end()) ans=max(ans,i-hm[pf[i]]);
+        <span class="kw">else</span> hm[pf[i]]=i;           <span class="cm">// only insert first occurrence</span>
+    }
+    <span class="kw">return</span> ans;
+}
+<span class="cm">// Dry run: arr=[4,-3,-1,2,-2], pf=[4,1,0,2,0]</span>
+<span class="cm">// hm={0:-1}: 4→{4:0}, 1→{1:1}, 0→SEEN len=2-(-1)=3 ans=3, 2→{2:3}, 0→SEEN len=4-(-1)=5 ans=5 ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 525 — Contiguous Array (Equal 1s and 0s)</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Replace 0s with −1s → equal 1s and 0s ≡ sum=0 → apply maxLength.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">findMaxLength</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums){  <span class="cm">// TC: O(N), SC: O(N)</span>
+    <span class="kw">for</span>(<span class="ty">int</span>&amp; x:nums) <span class="kw">if</span>(x==0) x=-1;
+    unordered_map&lt;<span class="ty">int</span>,<span class="ty">int</span>&gt; hm; hm[0]=-1;
+    <span class="ty">int</span> pf=0,ans=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;(<span class="ty">int</span>)nums.size();i++){
+        pf+=nums[i];
+        <span class="kw">if</span>(hm.find(pf)!=hm.end()) ans=max(ans,i-hm[pf]);
+        <span class="kw">else</span> hm[pf]=i;
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Distinct Elements in Window of Size K</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">HashSet fails: deleting an element removes all its occurrences. Use HashMap with frequency: when freq hits 0, erase from map. um.size() = distinct count.</div>
+<pre class="code"><span class="kw">void</span> <span class="fn">distinctWindow</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){  <span class="cm">// TC: O(N), SC: O(k)</span>
+    <span class="ty">int</span> N=arr.size();
+    unordered_map&lt;<span class="ty">int</span>,<span class="ty">int</span>&gt; um;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;k;i++) um[arr[i]]++;
+    cout&lt;&lt;um.size()&lt;&lt;" ";
+    <span class="ty">int</span> s=1,e=k;
+    <span class="kw">while</span>(e&lt;N){
+        um[arr[s-1]]--;
+        <span class="kw">if</span>(um[arr[s-1]]==0) um.erase(arr[s-1]);
+        um[arr[e]]++;
+        cout&lt;&lt;um.size()&lt;&lt;" ";
+        s++;e++;
+    }
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Count Pairs with Sum = K</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">For each arr[i]: look up um[k-arr[i]] (count of previous elements that pair with it), THEN increment um[arr[i]]. Order matters to avoid double-counting!</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">pairs</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){  <span class="cm">// TC: O(N), SC: O(N)</span>
+    unordered_map&lt;<span class="ty">int</span>,<span class="ty">int</span>&gt; um;
+    <span class="ty">int</span> ans=0;
+    <span class="kw">for</span>(<span class="ty">int</span> x:arr){
+        ans+=um[k-x];   <span class="cm">// look up BEFORE inserting current element</span>
+        um[x]++;
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 560 — Subarray Sum Equals K</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">sum(i..j) = pf[j]−pf[i-1]=k → pf[i-1]=pf[j]−k → count occurrences of pf[j]−k so far.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">subarraySum</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums,<span class="ty">int</span> k){
+    unordered_map&lt;<span class="ty">int</span>,<span class="ty">int</span>&gt; um; um[0]=1;
+    <span class="ty">int</span> pf=0,ans=0;
+    <span class="kw">for</span>(<span class="ty">int</span> x:nums){pf+=x;ans+=um[pf-k];um[pf]++;}
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+`
+},
+{
+id:"m7",num:"07",title:"Recursion — Introduction & Core Problems",desc:"Classes 45–49: 3 steps, sum/factorial/print patterns, sum of digits, Fibonacci, pow(a,n) both ways, pow(a,n,m), TC analysis via recurrence (substitution method), Master's Theorem, SC in recursion.",
+html:`
+<h3><span class="dot"></span>Today's content (Classes 45–49)</h3>
+<ul class="points">
+  <li>Recursion Intro — where it's used</li>
+  <li>3 Steps to write recursive code</li>
+  <li>Print 1..N, N..1, N..1..N, sum, factorial, pattern, Fibonacci</li>
+  <li>pow(a,n) — linear &amp; fast (O(log n))</li>
+  <li>pow(a,n,m) — modular power</li>
+  <li>TC for Fibonacci — substitution method + tree approach</li>
+  <li>Master's Theorem (Simplified)</li>
+  <li>Space Complexity in Recursion</li>
+</ul>
+
+<h3><span class="dot"></span>Where Recursion is Used</h3>
+<ul class="points">
+  <li>Sorting — Merge Sort, Quick Sort</li>
+  <li>Advanced Linked List</li>
+  <li>Trees — BT / BST / BBST / Segment Trees</li>
+  <li>Dynamic Programming</li>
+  <li>Graphs</li>
+</ul>
+
+<h3><span class="dot"></span>3 Steps to Write Recursive Code</h3>
+<div class="step-box"><div class="s-title">Step 1 — Assumption</div><p>Decide what your function does. Given input, what it does and what it returns.</p></div>
+<div class="step-box"><div class="s-title">Step 2 — Main Logic</div><p>Solve using subproblem. Call same function with smaller input.</p></div>
+<div class="step-box"><div class="s-title">Step 3 — Base Condition</div><p>Inputs for which we STOP recursion. Handle separately.</p></div>
+<div class="warn"><strong>Why base condition is needed:</strong> Without it, function calls never stop → StackOverflow (Java) or MLE (C++). Each function uses ≥10 bytes. Stack limit ≈ 10MB → at most ~10⁶ calls. Why not TLE? O(1) per call × 10⁶ calls = 10⁶ &lt;&lt; 10⁸.<br><br><strong>Recursion Religion:</strong> "Call subproblem — it will work as per assumption. Build intuition from tracing."</div>
+
+<h3><span class="dot"></span>Core Recursive Problems</h3>
+<pre class="code"><span class="cm">// Problem 1: Sum of N natural numbers — sum(N) = sum(N-1) + N</span>
+<span class="ty">int</span> <span class="fn">sum</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N==1) <span class="kw">return</span> 1;          <span class="cm">// base: sum(1)=1</span>
+    <span class="kw">return</span> sum(N-1)+N;
+}
+<span class="cm">// sum(4): sum(4)→sum(3)+4 → sum(2)+3 → sum(1)+2 → 1  ⟹ 1+2+3+4=10 ✓</span>
+
+<span class="cm">// Problem 2: Factorial — fact(N) = fact(N-1) × N</span>
+<span class="ty">int</span> <span class="fn">fact</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N==0) <span class="kw">return</span> 1;
+    <span class="kw">return</span> fact(N-1)*N;
+}
+
+<span class="cm">// Problem 3: Print 1..N — inc(N) = inc(N-1) THEN print(N)</span>
+<span class="kw">void</span> <span class="fn">inc</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N==1){cout&lt;&lt;1;<span class="kw">return</span>;}
+    inc(N-1);       <span class="cm">// print 1..N-1 first</span>
+    cout&lt;&lt;N;
+}
+
+<span class="cm">// Problem 4: Print N..1 — dec(N) = print(N) THEN dec(N-1)</span>
+<span class="kw">void</span> <span class="fn">dec</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N==1){cout&lt;&lt;1;<span class="kw">return</span>;}
+    cout&lt;&lt;N;
+    dec(N-1);
+}
+
+<span class="cm">// Problem 5: Print N..1..N — decInc(N) = print(N), decInc(N-1), print(N) again!</span>
+<span class="kw">void</span> <span class="fn">decInc</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N==0) <span class="kw">return</span>;
+    cout&lt;&lt;N;
+    decInc(N-1);
+    cout&lt;&lt;N;    <span class="cm">// N appears TWICE because it executes after recursion unwinds</span>
+}
+<span class="cm">// decInc(3): 3→decInc(2)→2→decInc(1)→1→decInc(0)[ret]→1→2→3 → "3 2 1 1 2 3" ✓</span></pre>
+
+<h3><span class="dot"></span>Sum of Digits &amp; Pattern</h3>
+<pre class="code"><span class="cm">// Problem 6: Sum of digits — sod(N) = sod(N/10) + N%10</span>
+<span class="ty">int</span> <span class="fn">sumDigits</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N==0) <span class="kw">return</span> 0;
+    <span class="kw">return</span> sumDigits(N/10)+N%10;
+}
+<span class="cm">// sum(365)=sum(36)+5=sum(3)+6+5=0+3+6+5=14 ✓</span>
+
+<span class="cm">// Problem 7: Pattern 1 2 2 3 3 3 4 4 4 4</span>
+<span class="kw">void</span> <span class="fn">pat</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N==0) <span class="kw">return</span>;
+    pat(N-1);
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;=N;i++) cout&lt;&lt;N&lt;&lt;" ";
+}</pre>
+
+<h3><span class="dot"></span>Problem 8 — Fibonacci</h3>
+<pre class="code"><span class="cm">// fib(N) = fib(N-1) + fib(N-2)   fib(0)=0, fib(1)=1</span>
+<span class="cm">// TWO base cases needed! fib(1)=fib(0)+fib(-1) ✗  → valid from fib(2)</span>
+<span class="ty">int</span> <span class="fn">fib</span>(<span class="ty">int</span> N){
+    <span class="kw">if</span>(N&lt;=1) <span class="kw">return</span> N;    <span class="cm">// fib(0)=0, fib(1)=1</span>
+    <span class="kw">return</span> fib(N-1)+fib(N-2);
+}
+<span class="cm">// TC: O(2ᴺ)  SC: O(N) — max stack depth = N</span></pre>
+
+<h3><span class="dot"></span>Problem 9 — pow(a, n) — Two Approaches</h3>
+<pre class="code"><span class="cm">// Approach 1: Linear — TC: O(N)</span>
+<span class="ty">long</span> <span class="fn">pow1</span>(<span class="ty">int</span> a,<span class="ty">int</span> n){
+    <span class="kw">if</span>(n==0) <span class="kw">return</span> 1;
+    <span class="kw">return</span> pow1(a,n-1)*a;
+}
+
+<span class="cm">// Approach 2: Fast Exponentiation — TC: O(log n)</span>
+<span class="cm">// pow(a,8) = pow(a,4)×pow(a,4)  even</span>
+<span class="cm">// pow(a,9) = pow(a,4)×pow(a,4)×a  odd</span>
+<span class="cm">// WRONG: return pow(a,n/2)*pow(a,n/2) — calls TWICE! waste!</span>
+<span class="cm">// CORRECT: store in t and reuse</span>
+<span class="ty">long</span> <span class="fn">pow2</span>(<span class="ty">int</span> a,<span class="ty">int</span> n){
+    <span class="kw">if</span>(n==0) <span class="kw">return</span> 1;
+    <span class="ty">long</span> t=pow2(a,n/2);    <span class="cm">// compute ONCE</span>
+    <span class="kw">if</span>(n%2==0) <span class="kw">return</span> t*t;
+    <span class="kw">else</span>       <span class="kw">return</span> t*t*a;
+}
+<span class="cm">// Recursive relation for pow2: T(N)=T(N/2)+O(1) → TC: O(log N)  SC: O(log N)</span></pre>
+
+<h3><span class="dot"></span>Problem 10 — pow(a, n, m) — Modular Power</h3>
+<pre class="code"><span class="cm">// Constraints: -10⁹≤a≤10⁹, 1≤N≤10¹⁸, M=10⁹+7</span>
+<span class="cm">// Idea 1: compute aᴺ then %M — WRONG: too big, can't store in any variable</span>
+<span class="cm">// Idea 2: apply %M at each step using (aᴺ/²)²%M</span>
+<span class="ty">long</span> <span class="fn">powMod</span>(<span class="ty">int</span> a,<span class="ty">long</span> n,<span class="ty">int</span> m){
+    <span class="kw">if</span>(n==0) <span class="kw">return</span> 1;
+    <span class="ty">long</span> t=powMod(a,n/2,m);    <span class="cm">// store ONCE</span>
+    <span class="kw">if</span>(n%2==0) <span class="kw">return</span> (t*t)%m;
+    <span class="kw">else</span>       <span class="kw">return</span> ((t*t)%m*(a%m))%m;
+}
+<span class="ty">long</span> <span class="fn">solve</span>(<span class="ty">int</span> a,<span class="ty">long</span> n,<span class="ty">int</span> m){
+    <span class="ty">long</span> t=powMod(a,n,m);
+    <span class="kw">return</span> (t+m)%m;    <span class="cm">// handle negative a</span>
+}
+<span class="cm">// TC: O(log n)  SC: O(log n)</span></pre>
+
+<h3><span class="dot"></span>TC Analysis — Recurrence Relations (Substitution Method)</h3>
+<pre class="code"><span class="cm">// T(N) = T(N-1) + C  [sum(), fact(), dec(), pow1()]   Base: T(1)=1</span>
+T(N) = T(N-1)+C = T(N-2)+2C = T(N-3)+3C = ... = T(N-k)+kC
+<span class="cm">// Set N-k=1 → k=N-1</span>
+T(N) = T(1)+(N-1)C = 1+(N-1)C = O(N) ✓
+
+<span class="cm">// T(N) = T(N/2) + C  [pow2(), binary search type]   Base: T(1)=1</span>
+T(N) = T(N/2)+1 = T(N/4)+2 = T(N/8)+3 = T(N/2ᵏ)+k
+<span class="cm">// Set N/2ᵏ=1 → k=log₂N</span>
+T(N) = T(1)+log₂N = O(log N) ✓
+
+<span class="cm">// T(N) = 2T(N/2) + C  [pow2 with two calls — WRONG approach]   Base: T(1)=1</span>
+T(N)→2T(N/2)+1→4T(N/4)+3→8T(N/8)+7→2ᵏT(N/2ᵏ)+2ᵏ-1
+<span class="cm">// k=log₂N → T(N) = N·T(1) + N-1 = 2N-1 = O(N) ✓</span></pre>
+
+<h3><span class="dot"></span>TC for Fibonacci — Tree Approach (2nd Approach)</h3>
+<pre class="code"><span class="cm">// T(N) = T(N-1) + T(N-2) + 1   Base: T(0)=T(1)=1</span>
+<span class="cm">// Expanding T(N-1) and T(N-2) gets complicated when T(N) depends on 2+ terms</span>
+<span class="cm">// Tree approach: No. of function calls × Time per call</span>
+<span class="cm">//</span>
+<span class="cm">// Level 1:  1 call  = 2¹⁻¹</span>
+<span class="cm">// Level 2:  3 calls = 2²⁻¹</span>
+<span class="cm">// Level 3:  7 calls = 2³⁻¹</span>
+<span class="cm">// Level k:  2ᵏ⁻¹ calls</span>
+<span class="cm">// Last level (N+1): 2ᴺ calls → total = 2ᴺ⁺¹-1 calls</span>
+<span class="cm">// TC = (2ᴺ⁺¹-1) × O(1) = 2×2ᴺ = O(2ᴺ)</span>
+<span class="cm">// Drawback: assumes all calls take same time (upper bound only)</span>
+<span class="cm">// SC: O(N) — max stack depth = N (one branch at a time)</span></pre>
+<div class="info-box">
+  <div class="i-title">&#9670; Stack trace for fib (from notes)</div>
+  <p>Size = 1, 2, 3, 1, 3, 2, 3, 2, 1 — at any point, only one path from root to leaf is on the stack. Max = N frames.</p>
+</div>
+
+<h3><span class="dot"></span>Simplified Master's Theorem</h3>
+<div class="keybox">
+  <div class="kb-title">◆ Master's Theorem Formula</div>
+  <p>For T(N) = aT(N/b) + O(Nᶜ), let <strong>t = log_b(a)</strong>:</p>
+  <ul>
+    <li>If t &lt; c: T(N) = O(Nᶜ)</li>
+    <li>If t = c: T(N) = O(Nᶜ log N)</li>
+    <li>If t &gt; c: T(N) = O(Nᵗ)</li>
+  </ul>
+</div>
+<pre class="code"><span class="cm">// Example 1: T(N) = 2T(N/2) + O(1)  → a=2, b=2, c=0</span>
+<span class="cm">// t = log₂(2) = 1  →  t &gt; c: O(N¹) = O(N) ✓</span>
+
+<span class="cm">// Example 2: T(N) = 2T(N/2) + O(N)  → a=2, b=2, c=1  (MERGE SORT)</span>
+<span class="cm">// t = log₂(2) = 1  →  t = c: O(N log₂N) ✓</span>
+
+<span class="cm">// Example 3: T(N) = T(N/2) + O(1)  → a=1, b=2, c=0  (TODO: binary search)</span>
+<span class="cm">// t = log₂(1) = 0  →  t = c: O(N⁰ log N) = O(log N) ✓</span></pre>
+
+<h3><span class="dot"></span>Space Complexity in Recursion</h3>
+<p class="body"><strong>SC = Max stack size during execution</strong></p>
+<table class="tbl">
+  <tr><th>Function</th><th>Recurrence</th><th>SC</th></tr>
+  <tr><td>sum(N), fact(N), dec(N)</td><td>T(N)=T(N-1)+C, depth=N</td><td>O(N)</td></tr>
+  <tr><td>pow1(a,N)</td><td>T(N)=T(N-1)+C, depth=N</td><td>O(N)</td></tr>
+  <tr><td>pow2(a,N) fast</td><td>T(N)=T(N/2)+C, depth=log₂N</td><td>O(log N)</td></tr>
+  <tr><td>fib(N)</td><td>Two branches, max depth=N</td><td>O(N)</td></tr>
+</table>
+`
+},
+{
+id:"m8",num:"08",title:"Searching — Binary Search Fundamentals",desc:"Classes 53–55: Searching intro, Binary Search idea & when to apply, iterative BS, floor & ceil, first & last occurrence, local maxima — with full dry runs from notes.",
+html:`
+<h3><span class="dot"></span>Today's content (Classes 53–55)</h3>
+<ul class="points">
+  <li>Searching Intro — Target &amp; Search Space</li>
+  <li>Binary Search: idea, when to apply, iterative code</li>
+  <li>Search floor of element in sorted array</li>
+  <li>Search ceil of element in sorted array</li>
+  <li>First occurrence index in sorted array</li>
+  <li>Last occurrence index (TODO in notes)</li>
+  <li>Local Maxima in unsorted array</li>
+  <li>Unique element in sorted array (every other repeats twice)</li>
+  <li>Integer Square Root</li>
+</ul>
+
+<h3><span class="dot"></span>Searching Basics (from notes)</h3>
+<div class="keybox">
+  <div class="kb-title">◆ Two key things in every search problem</div>
+  <p><strong>Target:</strong> What to search (Whom to search)</p>
+  <p><strong>Search Space:</strong> Where to search</p>
+  <p><em>Observation:</em> If search space is ordered, searching becomes easier.</p>
+</div>
+<pre class="code"><span class="cm">// Examples:</span>
+<span class="cm">// Target: Word    Search Space: Dictionary / Wikipedia / Newspaper</span>
+<span class="cm">// Target: Phone   Search Space: Contacts / Phone diary</span></pre>
+
+<h3><span class="dot"></span>Binary Search — The Core Idea</h3>
+<p class="body">We divide the search space into 2 equal parts and discard 1 half, then search in the other half. This type of search is called <strong>Binary Search</strong>.</p>
+<div class="keybox">
+  <div class="kb-title">◆ When to Apply BS</div>
+  <p>After dividing search space, at each step we should be able to <strong>discard 1 half</strong> of search. Then apply BS.</p>
+  <p><em>Where to land?</em> Always halve → N/2 → always discard N/2. Better: landing at N/3 → discard 2N/3 best case, N/3 worst. But N/2 is still optimal for guaranteed O(log N).</p>
+</div>
+
+<h3><span class="dot"></span>BS in Sorted Array — 3 Ideas (from notes)</h3>
+<table class="tbl">
+  <tr><th>Idea</th><th>Approach</th><th>TC</th><th>SC</th></tr>
+  <tr><td>1</td><td>Iterate and search (Linear)</td><td>O(N)</td><td>O(1)</td></tr>
+  <tr><td>2</td><td>Insert into HashSet, search</td><td>O(N)</td><td>O(N)</td></tr>
+  <tr><td>3</td><td>Binary Search — use sorted order!</td><td>O(log₂N)</td><td>O(1)</td></tr>
+</table>
+
+<h3><span class="dot"></span>Binary Search — Iterative Code</h3>
+<pre class="code"><span class="cm">// Given sorted arr[], search if k is present</span>
+<span class="cm">// Track search space: keep start (l) and end (h)</span>
+<span class="cm">// Cases: arr[m]==k → True  |  arr[m]>k → discard right: h=m-1  |  arr[m]&lt;k → discard left: l=m+1</span>
+<span class="cm">// Stop: l&gt;h means search space empty → not found</span>
+
+<span class="ty">bool</span> <span class="fn">search</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){  <span class="cm">// TC: O(log₂N)×O(1)  SC: O(1)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="ty">int</span> l=0,h=N-1;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(arr[m]==k) <span class="kw">return</span> <span class="kw">true</span>;
+        <span class="kw">if</span>(arr[m]&gt;k) h=m-1;   <span class="cm">// k is smaller → go left</span>
+        <span class="kw">else</span>         l=m+1;   <span class="cm">// k is larger → go right</span>
+    }
+    <span class="kw">return</span> <span class="kw">false</span>;
+}
+<span class="cm">// TC analysis: Search space: N → N/2 → N/4 → N/8 → ... → log₂N → 1  ✓</span></pre>
+<div class="info-box">
+  <div class="i-title">&#9670; Dry Run from Notes (arr=[3,6,9,12,14,19,20,23,25,27], k=12)</div>
+  <p>l=0, h=9, m=4: arr[4]=14&gt;12 → h=3 | l=0, h=3, m=1: arr[1]=6&lt;12 → l=2 | l=2, h=3, m=2: arr[2]=9&lt;12 → l=3 | l=3, h=3, m=3: arr[3]=12==12 → return true ✓</p>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Floor of Element in Sorted Array</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">floor(k) = greatest element ≤ k in arr[]. If doesn't exist: return INT_MIN.</div>
+  <div class="ex-box"><span class="lbl">Example (from notes)</span>arr={-5,2,3,6,9,10,11,14,18}, k=5→3, k=10→10, k=24→18, k=-7→INT_MIN</div>
+  <div class="approach-box"><div class="a-title">Idea 1 — Linear: O(N). Iterate, track ans=-∞, stop when arr[i]&gt;k.</div></div>
+  <div class="approach-box"><div class="a-title">Idea 2 — Binary Search: Target = greatest ele ≤ k. Ans = -∞ initially.</div>
+    <p>Case 1: arr[m]==k → return k (floor is k itself). Case 2: arr[m]&lt;k → ans=arr[m], go right (there might be a better answer). Case 3: arr[m]&gt;k → go left (discard right).</p>
+  </div>
+<pre class="code"><span class="ty">int</span> <span class="fn">floorIndex</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){  <span class="cm">// TC: O(log N), SC: O(1)</span>
+    <span class="ty">int</span> l=0,h=arr.size()-1;
+    <span class="ty">int</span> ans=INT_MIN;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(arr[m]==k) <span class="kw">return</span> k;
+        <span class="kw">if</span>(arr[m]&lt;k){ans=arr[m];l=m+1;}  <span class="cm">// m is a candidate, go right for better</span>
+        <span class="kw">else</span>{h=m-1;}                       <span class="cm">// arr[m]>k: discard right</span>
+    }
+    <span class="kw">return</span> ans;
+}
+<span class="cm">// Dry run: arr={2,4,8,12,15,22,24,26}, k=20</span>
+<span class="cm">// l=0,h=7,m=3: arr[3]=12&lt;20 → ans=12, l=4 | l=4,h=7,m=5: arr[5]=22&gt;20 → h=4</span>
+<span class="cm">// l=4,h=4,m=4: arr[4]=15&lt;20 → ans=15, l=5 | l=5,h=4: break → return ans=15 ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Ceil of Element in Sorted Array</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">ceil(k) = smallest element ≥ k. Mirror of floor.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">ceilIndex</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){
+    <span class="ty">int</span> l=0,h=arr.size()-1;
+    <span class="ty">int</span> ans=INT_MAX;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(arr[m]==k) <span class="kw">return</span> k;
+        <span class="kw">if</span>(arr[m]&gt;k){ans=arr[m];h=m-1;}   <span class="cm">// m is a candidate, go left for better</span>
+        <span class="kw">else</span>{l=m+1;}                       <span class="cm">// arr[m]&lt;k: discard left</span>
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — First Occurrence of Element in Sorted Array</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Return first occurrence index of k. If k not present: return −1.</div>
+  <div class="ex-box"><span class="lbl">Example (from notes)</span>arr={-5,-5,-3,0,0,1,1,5,5,5,5,5,5,8,10,10,15}, k=5 → 7, k=-5 → 0, k=20 → -1</div>
+  <div class="approach-box"><div class="a-title">Idea 2 — Binary Search: 3 cases</div>
+    <p>Case 1: arr[m]&gt;k → go left (h=m-1). Case 2: arr[m]&lt;k → go right (l=m+1). Case 3: arr[m]==k → m MIGHT be answer (there could be another occurrence left). Store ans=m, then go left (h=m-1).</p>
+    <p><strong>Doubt from notes:</strong> Why does m land on 1st occurrence? It can land on 2nd! Fix: if arr[m]==arr[m-1], set m=m-1 to move to first occurrence before processing.</p>
+  </div>
+<pre class="code"><span class="ty">int</span> <span class="fn">firstOccurrence</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){  <span class="cm">// TC: O(log N), SC: O(1)</span>
+    <span class="ty">int</span> l=0,h=arr.size()-1;
+    <span class="ty">int</span> ans=-1;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(arr[m]==k){
+            ans=m;      <span class="cm">// m might be answer but look left for earlier occurrence</span>
+            h=m-1;
+        }
+        <span class="kw">else if</span>(arr[m]&gt;k) h=m-1;
+        <span class="kw">else</span>              l=m+1;
+    }
+    <span class="kw">return</span> ans;
+}
+<span class="cm">// Dry run: arr={2,5,5,5,5,5,8,10}, k=5</span>
+<span class="cm">// l=0,h=7,m=3: arr[3]==5 → ans=3, h=2 | l=0,h=2,m=1: arr[1]==5 → ans=1, h=0</span>
+<span class="cm">// l=0,h=0,m=0: arr[0]=2&lt;5 → l=1 | l=1,h=0: stop → return ans=1 ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Last Occurrence of Element in Sorted Array</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Mirror of first occurrence. When arr[m]==k: store ans=m, go RIGHT (l=m+1).</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">lastOccurrence</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> k){
+    <span class="ty">int</span> l=0,h=arr.size()-1;
+    <span class="ty">int</span> ans=-1;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(arr[m]==k){ans=m;l=m+1;}  <span class="cm">// go RIGHT for later occurrence</span>
+        <span class="kw">else if</span>(arr[m]&gt;k) h=m-1;
+        <span class="kw">else</span>              l=m+1;
+    }
+    <span class="kw">return</span> ans;
+}
+<span class="cm">// Count of k in sorted array = lastOccurrence(k) - firstOccurrence(k) + 1</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Local Maxima in Unsorted Array</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge hard">Hard</span></div></div>
+  <div class="prob-desc">All distinct elements. arr[i] is local maxima if arr[i]&gt;arr[i-1] AND arr[i]&gt;arr[i+1]. Return any one. Special: arr[0] is local maxima if arr[0]&gt;arr[1]. arr[N-1] if arr[N-1]&gt;arr[N-2].</div>
+  <div class="ex-box"><span class="lbl">Example (from notes)</span>arr={9,8,7,3,6,4,1,5,2,10,4} → local maxima: 9,6,5,10 (return any)</div>
+  <div class="approach-box"><div class="a-title">Idea 2 — Binary Search: 4 cases at mid</div>
+    <p><strong>Case 1:</strong> arr[m]&gt;arr[m-1] AND arr[m]&gt;arr[m+1] → local maxima, return arr[m].</p>
+    <p><strong>Case 2:</strong> arr[m+1]&gt;arr[m] → go right (guarantee: local maxima EXISTS on right side — data is increasing toward right).</p>
+    <p><strong>Case 3:</strong> arr[m-1]&gt;arr[m] → go left (local maxima exists on left).</p>
+    <p><strong>Case 4:</strong> Both sides bigger than m → go any side.</p>
+    <p><em>Conclusion: "Whichever side data increases, that side has local maxima."</em></p>
+  </div>
+<pre class="code"><span class="ty">int</span> <span class="fn">localMaxima</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(log N), SC: O(1)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="kw">if</span>(N==1) <span class="kw">return</span> arr[0];
+    <span class="kw">if</span>(arr[0]&gt;arr[1]) <span class="kw">return</span> arr[0];
+    <span class="kw">if</span>(arr[N-1]&gt;arr[N-2]) <span class="kw">return</span> arr[N-1];
+    <span class="ty">int</span> l=1,h=N-2;         <span class="cm">// m=0 would check arr[-1], m=N-1 checks arr[N] → errors!</span>
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(arr[m]&gt;arr[m-1] &amp;&amp; arr[m]&gt;arr[m+1]) <span class="kw">return</span> arr[m];  <span class="cm">// Case 1</span>
+        <span class="kw">if</span>(arr[m+1]&gt;arr[m]) l=m+1;   <span class="cm">// Case 2: go right</span>
+        <span class="kw">else</span>                h=m-1;   <span class="cm">// Case 3: go left</span>
+    }
+    <span class="kw">return</span> -1;
+}
+<span class="cm">// Dry run: arr={4,3}, l=0,h=1,m=0: arr[0]>arr[1] → return arr[0]=4 (via boundary check)</span>
+<span class="cm">// Dry run: arr={3,4,7}, l=1,h=1,m=1: arr[2]>arr[1]? NO. arr[0]=3&lt;arr[1]=4 → l=m+1 →</span>
+<span class="cm">//         l=2,h=1: stop. arr[2]=7 is local maxima via boundary check ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 162 — Find Peak Element</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Same as local maxima. Return index of any peak.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">findPeakElement</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums){
+    <span class="ty">int</span> N=nums.size();
+    <span class="kw">if</span>(N==1) <span class="kw">return</span> 0;
+    <span class="kw">if</span>(nums[0]&gt;nums[1]) <span class="kw">return</span> 0;
+    <span class="kw">if</span>(nums[N-1]&gt;nums[N-2]) <span class="kw">return</span> N-1;
+    <span class="ty">int</span> l=1,h=N-2;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=l+(h-l)/2;   <span class="cm">// safe mid: avoids (l+h) overflow</span>
+        <span class="kw">if</span>(nums[m]&gt;nums[m-1] &amp;&amp; nums[m]&gt;nums[m+1]) <span class="kw">return</span> m;
+        <span class="kw">if</span>(nums[m+1]&gt;nums[m]) l=m+1;
+        <span class="kw">else</span>                  h=m-1;
+    }
+    <span class="kw">return</span> -1;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 540 — Single Element in Sorted Array (every other repeats twice)</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Every element appears twice except one. Duplicates are adjacent. O(log N).</div>
+  <div class="approach-box"><div class="a-title">Key observation from notes</div>
+    <p><strong>Left side of unique element:</strong> 1st occurrence of any pair is at EVEN index.</p>
+    <p><strong>Right side of unique element:</strong> 1st occurrence of any pair is at ODD index.</p>
+    <p>If arr[m]==arr[m-1]: m is at 2nd occurrence → set m=m-1 to normalize to 1st occurrence. Then: m even → unique is right (l=m+2); m odd → unique is left (h=m-1).</p>
+  </div>
+<pre class="code"><span class="ty">int</span> <span class="fn">singleNonDuplicate</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr){  <span class="cm">// TC: O(log N)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="kw">if</span>(N==1) <span class="kw">return</span> arr[0];
+    <span class="kw">if</span>(arr[0]!=arr[1]) <span class="kw">return</span> arr[0];
+    <span class="kw">if</span>(arr[N-1]!=arr[N-2]) <span class="kw">return</span> arr[N-1];
+    <span class="ty">int</span> l=1,h=N-2;   <span class="cm">// avoid boundary errors</span>
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(arr[m-1]!=arr[m] &amp;&amp; arr[m]!=arr[m+1]) <span class="kw">return</span> arr[m];  <span class="cm">// unique found</span>
+        <span class="kw">if</span>(arr[m]==arr[m-1]) m=m-1;  <span class="cm">// normalize to 1st occurrence</span>
+        <span class="kw">if</span>(m%2==0) l=m+2;  <span class="cm">// even 1st occ → unique is on right</span>
+        <span class="kw">else</span>       h=m-1;  <span class="cm">// odd 1st occ → unique is on left</span>
+    }
+    <span class="kw">return</span> -1;
+}
+<span class="cm">// Dry run: arr={3,3,1,1,8,8,10,10,19,6,6,2,2,4,4}, unique at idx 8</span>
+<span class="cm">// l=0,h=14,m=7: arr[7]==arr[m-1](10==10) → m=6(even) → l=m+2=8</span>
+<span class="cm">// l=8,h=14,m=11: arr[11-1]!=arr[11](9!=1): 1st occ, m=11 is odd → h=10</span>
+<span class="cm">// l=8,h=10,m=9: arr[9-1]!=arr[9]: 1st occ, m=9 is odd → h=8</span>
+<span class="cm">// l=8,h=8: m=8, arr[7]!=arr[8] &amp; arr[8]!=arr[9] → return arr[8]=19 ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 34 — Find First and Last Position in Sorted Array</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+<pre class="code"><span class="ty">vector</span>&lt;<span class="ty">int</span>&gt; <span class="fn">searchRange</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums,<span class="ty">int</span> target){
+    <span class="kw">auto</span> first=[&amp;]()-&gt;<span class="ty">int</span>{
+        <span class="ty">int</span> l=0,h=nums.size()-1,ans=-1;
+        <span class="kw">while</span>(l&lt;=h){<span class="ty">int</span> m=l+(h-l)/2;<span class="kw">if</span>(nums[m]==target){ans=m;h=m-1;}<span class="kw">else if</span>(nums[m]&lt;target)l=m+1;<span class="kw">else</span> h=m-1;}
+        <span class="kw">return</span> ans;
+    };
+    <span class="kw">auto</span> last=[&amp;]()-&gt;<span class="ty">int</span>{
+        <span class="ty">int</span> l=0,h=nums.size()-1,ans=-1;
+        <span class="kw">while</span>(l&lt;=h){<span class="ty">int</span> m=l+(h-l)/2;<span class="kw">if</span>(nums[m]==target){ans=m;l=m+1;}<span class="kw">else if</span>(nums[m]&lt;target)l=m+1;<span class="kw">else</span> h=m-1;}
+        <span class="kw">return</span> ans;
+    };
+    <span class="kw">return</span> {first(),last()};
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 69 — Integer Square Root (sqrt(N))</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge easy">Easy</span></div></div>
+  <div class="prob-desc">Find greatest i such that i×i ≤ N. BS on imaginary search space [1..N].</div>
+  <div class="approach-box"><div class="a-title">Idea 1 — Linear: O(√N). Iterate till i²&gt;N.</div></div>
+  <div class="approach-box"><div class="a-title">Idea 2 — Binary Search on [1..N]: O(log N).</div>
+    <p>Case 1: m×m≤N → ans=m, go right (look for larger i). Case 2: m×m&gt;N → go left.</p>
+    <p><strong>Overflow fix:</strong> m²&gt;N → avoid computing m*m when N=INT_MAX. Better: m*m&lt;=N/m → check m&lt;=N/m. Or use: <code>long m = l+(long)(h-l)/2;</code></p>
+  </div>
+<pre class="code"><span class="ty">int</span> <span class="fn">mySqrt</span>(<span class="ty">int</span> N){  <span class="cm">// TC: O(log N), SC: O(1)</span>
+    <span class="ty">long</span> l=1,h=N,ans=0;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">long</span> m=(l+h)/2;
+        <span class="kw">if</span>(m*m&lt;=N){ans=m;l=m+1;}  <span class="cm">// m is a candidate, go right</span>
+        <span class="kw">else</span>{h=m-1;}
+    }
+    <span class="kw">return</span> (<span class="ty">int</span>)ans;
+}
+<span class="cm">// Dry run N=30: l=1,h=30,m=15: 225&gt;30 → h=14 | m=7: 49&gt;30 → h=6</span>
+<span class="cm">// m=3: 9&lt;=30 → ans=3,l=4 | m=5: 25&lt;=30 → ans=5,l=6 | m=6: 36&gt;30 → h=5</span>
+<span class="cm">// l=6&gt;h=5: stop → return 5 ✓</span>
+<span class="cm">// Extra Info: when l=1,h=INT_MAX → (l+h) overflows! Fix: m=l+(h-l)/2</span></pre>
+</div>
+`
+},
+{
+id:"m9",num:"09",title:"Searching — Binary Search on Answer (Imaginary Search Space)",desc:"Classes 56–57: When to apply BS on imaginary SS, Painter's Partition, Aggressive Cows, Smallest subarray sum ≥ S — full dry runs and check functions.",
+html:`
+<h3><span class="dot"></span>Today's content (Classes 56–57)</h3>
+<ul class="points">
+  <li>When to apply BS — Types of problems</li>
+  <li>How to identify BS on answer (Imaginary Search Space)</li>
+  <li>Painter's Partition — minimize max time</li>
+  <li>Aggressive Cows — maximize minimum distance</li>
+  <li>Smallest subarray with sum ≥ S</li>
+</ul>
+
+<h3><span class="dot"></span>When to Apply Binary Search</h3>
+<div class="keybox">
+  <div class="kb-title">◆ Problem Types Where BS Applies</div>
+  <ul>
+    <li><strong>Find something</strong> — classic BS in real search space</li>
+    <li><strong>Minimum/Maximum</strong> — lowest/smallest/greatest/largest → think BS</li>
+  </ul>
+  <p><em>If you see these words in a problem, think Binary Search.</em></p>
+</div>
+
+<div class="keybox">
+  <div class="kb-title">◆ How to Apply BS — 3 Steps</div>
+  <ul>
+    <li><strong>1. Target:</strong> What are we finding?</li>
+    <li><strong>2. Search Space (Real or Imaginary):</strong> Must contain answer for any input.</li>
+    <li><strong>3. Discard:</strong> At every step, can we discard half the search space?</li>
+  </ul>
+  <p><strong>For Real SS:</strong> Figure out cases based on condition.</p>
+  <p><strong>For Imaginary SS — The Pattern:</strong></p>
+</div>
+<pre class="code"><span class="cm">// Imaginary Search Space Pattern 1: F F F F [T] T T T .. T</span>
+<span class="cm">// Find first True → when m is True: ans=m, go left; when False: go right</span>
+<span class="cm">//</span>
+<span class="cm">// Imaginary Search Space Pattern 2: T T T T [F] F F F .. F</span>
+<span class="cm">// Find last True → when m is True: ans=m, go right; when False: go left</span>
+<span class="cm">//</span>
+<span class="cm">// If imaginary SS falls under either pattern → apply BS ✓</span></pre>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Painter's Partition</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge hard">Hard</span></div></div>
+  <div class="prob-desc">N boards with lengths {l₀,l₁,...,lₙ₋₁} and W painters. One painter takes 1 sec per unit length. Each painter paints continuous boards only. All start together. Find minimum time to paint all boards.</div>
+  <div class="ex-box"><span class="lbl">Notes: Examples</span>
+    l={3,5,1,7,8,2,5,3,10,1,4,7,5,4,6}, W=3 → best partition gives ans=25 (W₁=24, W₂=25, W₃=22)<br>
+    l={1,1,1,1,1,101}, W=2 → ans=101 (one board length exceeds average → can't do better)
+  </div>
+  <div class="approach-box"><div class="a-title">Idea: "Avg allot time" doesn't work. BS on answer!</div>
+    <p><strong>Target:</strong> Minimum time needed.</p>
+    <p><strong>Search Space (Imaginary):</strong> [l=1, h=sum(len)]. Note: answer always lies in this range for any input.</p>
+    <p><strong>Discard logic:</strong> If we can paint all boards in m time → ans=m, go left (can we do better?). If we can't → go right.</p>
+    <p><strong>TC:</strong> O(log(sum(len)) × N) — BS iterations × check function</p>
+  </div>
+<pre class="code"><span class="cm">// Check function: can we paint all boards in m time with W painters?</span>
+<span class="cm">// Key: if any single board length > m → return false immediately!</span>
+<span class="cm">// Greedy: accumulate boards for current painter; if adding l[i] exceeds m → new painter</span>
+<span class="ty">bool</span> <span class="fn">check</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; blen,<span class="ty">int</span> m,<span class="ty">int</span> W){  <span class="cm">// TC: O(N), SC: O(1)</span>
+    <span class="ty">int</span> painters=1,tw=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;(<span class="ty">int</span>)blen.size();i++){
+        <span class="kw">if</span>(blen[i]&gt;m) <span class="kw">return</span> <span class="kw">false</span>;    <span class="cm">// single board > m → impossible</span>
+        tw+=blen[i];
+        <span class="kw">if</span>(tw&gt;m){painters++;tw=blen[i];} <span class="cm">// exceeded: assign new painter</span>
+    }
+    <span class="kw">return</span> painters&lt;=W;
+}
+
+<span class="ty">int</span> <span class="fn">minTime</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; blen,<span class="ty">int</span> N,<span class="ty">int</span> W){  <span class="cm">// TC: O(log(sum)×N)</span>
+    <span class="ty">long long</span> l=1,h=0,ans=0;
+    <span class="kw">for</span>(<span class="ty">int</span> x:blen) h+=x;  <span class="cm">// h = sum of all lengths (worst case: 1 painter)</span>
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">long long</span> m=(l+h)/2;
+        <span class="kw">if</span>(check(blen,m,W)){ans=m;h=m-1;}  <span class="cm">// possible: record and go left</span>
+        <span class="kw">else</span>{l=m+1;}                         <span class="cm">// not possible: go right</span>
+    }
+    <span class="kw">return</span> (<span class="ty">int</span>)ans;
+}
+<span class="cm">// Dry run: l={3,5,1,7,8,2,5,3,10,1,4,7,5,4,6}, W=3</span>
+<span class="cm">// sum=71, l=1,h=71: m=36 → check(36,3)=T → ans=36,h=35</span>
+<span class="cm">// m=18 → check(18,3)=T (W1=16,W2=18,W3=10) → ans=18,l=19? No: check dry run in notes</span>
+<span class="cm">// For W=4: m=36→T,h=35; m=18→T(l=1,h=35); continue BS until ans=18 ✓</span></pre>
+  <div class="info-box">
+    <div class="i-title">&#9670; Check function dry run (from notes): l={3,5,1,7,8,2,5,3,10,1,4,7,5,4,6}, W=4, m=18</div>
+    <p>C=1,T=0: 3→T=3; 5→T=8; 1→T=9; 7→T=16; 8→T=24&gt;18! → C=2,T=8; 2→T=10; 5→T=15; 3→T=18; 10→T=28&gt;18! → C=3,T=10; 1→T=11; 4→T=15; 7→T=22&gt;18! → C=4,T=7; 5→T=12; 4→T=16; 6→T=22&gt;18! → C=5 → return false. l=m+1.</p>
+  </div>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Aggressive Cows (SPOJ AGGRCOWS)</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge hard">Hard</span></div></div>
+  <div class="prob-desc">S stalls at positions stalls[N] on x-axis. Place C cows such that minimum distance between any 2 cows is maximized. Only 1 cow per stall. All cows must be placed. Positions are sorted.</div>
+  <div class="ex-box"><span class="lbl">Examples (from notes)</span>
+    stalls={1,2,4,8,9}, C=3 → ans=3 (place at 1,4,9 → min dist=3)<br>
+    stalls={2,6,11,14,19,25,30,39,43}, C=4 → ans=12 (place at 2,14,25,39)
+  </div>
+  <div class="approach-box"><div class="a-title">BS on answer (imaginary SS)</div>
+    <p><strong>Target:</strong> Maximum minimum distance between any 2 cows.</p>
+    <p><strong>Search Space (Imaginary):</strong> [l=1, h=stalls[N-1]-stalls[0]] — always contains answer.</p>
+    <p><strong>Case 1:</strong> Can place cows m distance apart → ans=m, go right (can we do better?). <strong>Case 2:</strong> Cannot → go left.</p>
+    <p><strong>TC:</strong> O(log(stalls[N-1]-stalls[0]) × S)</p>
+  </div>
+<pre class="code"><span class="cm">// Check: can we place C cows with min distance ≥ m?</span>
+<span class="cm">// Greedy: place 1st cow at stalls[0]. For each next stall: if dist from last placed ≥ m → place cow there.</span>
+<span class="ty">bool</span> <span class="fn">checkCows</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; stalls,<span class="ty">int</span> S,<span class="ty">int</span> C,<span class="ty">int</span> m){  <span class="cm">// TC: O(S)</span>
+    <span class="ty">int</span> lp=stalls[0],count=1;  <span class="cm">// place 1st cow at stalls[0]</span>
+    <span class="kw">for</span>(<span class="ty">int</span> i=1;i&lt;S;i++){
+        <span class="kw">if</span>(stalls[i]-lp&gt;=m){   <span class="cm">// distance ≥ m → place cow</span>
+            lp=stalls[i];
+            count++;
+        }
+    }
+    <span class="kw">return</span> count&gt;=C;
+}
+
+<span class="ty">int</span> <span class="fn">maxDist</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; stalls,<span class="ty">int</span> S,<span class="ty">int</span> C){
+    <span class="ty">int</span> l=1,h=stalls[S-1]-stalls[0],ans=0;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(checkCows(stalls,S,C,m)){ans=m;l=m+1;}  <span class="cm">// can place → record, go right</span>
+        <span class="kw">else</span>{h=m-1;}                                  <span class="cm">// cannot place → go left</span>
+    }
+    <span class="kw">return</span> ans;
+}
+<span class="cm">// Dry run: stalls={2,6,11,14,19,25,30,39,43}, C=4</span>
+<span class="cm">// h=41, m=21: check(21,4)? lp=2,c=1: 6-2=4&lt;21, 11-2=9&lt;21, 14-2=12&lt;21, 19-2=17&lt;21,</span>
+<span class="cm">//   25-2=23&gt;=21→lp=25,c=2: 30-25=5&lt;21, 39-25=14&lt;21, 43-25=18&lt;21 → c=2&lt;4 → false → h=20</span>
+<span class="cm">// m=10: check(10,4)? lp=2,c=1: 11-2=9&lt;10, 14-2=12&gt;=10→lp=14,c=2: 25-14=11&gt;=10→lp=25,c=3</span>
+<span class="cm">//   39-25=14&gt;=10→lp=39,c=4 → c=4&gt;=4 → true → ans=10, l=11</span>
+<span class="cm">// m=15: check(15,4)? Not possible, c&lt;4 → h=14 | m=12: check(12,4)? lp=2,c=1</span>
+<span class="cm">//   14-2=12&gt;=12→lp=14,c=2: 25-14=11&lt;12, 30-14=16&gt;=12→lp=30,c=3: 43-30=13&gt;=12→c=4→T</span>
+<span class="cm">//   ans=12, l=13 | m=13: check? Not possible → h=12 | l=13&gt;h=12 → return 12 ✓</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">GFG — Smallest Subarray with Sum ≥ S</div><div class="prob-meta"><span class="badge gfg">GFG</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Given arr[N] (positive) and S. Find length of smallest subarray with sum ≥ S.</div>
+  <div class="ex-box"><span class="lbl">Example (from notes)</span>arr={4,5,6,13,6,9,8,7,12,4,3}, S=20 → ans=3 (subarray {6,9,8} or {13,6} etc)</div>
+  <div class="approach-box"><div class="a-title">BS on answer (imaginary SS)</div>
+    <p><strong>Target:</strong> Length of smallest subarray with sum ≥ S.</p>
+    <p><strong>Search Space (Imaginary):</strong> [l=1, h=N].</p>
+    <p><strong>Pattern:</strong> "There exists a subarray of length m with sum ≥ S" → F F F F [T] T T T ... T</p>
+    <p><em>Why?</em> If there's a subarray of length m with sum ≥ S, removing 1 element reduces sum → sum &lt; S (for any length m-1 subarray). So shorter lengths are ALL False. Longer are ALL True.</p>
+    <p><strong>Case 1:</strong> If check(m) → answer ≤ m → ans=m, go left. <strong>Case 2:</strong> check fails → go right.</p>
+  </div>
+<pre class="code"><span class="cm">// Check: does there exist a subarray of length m with sum >= S?</span>
+<span class="cm">// Sliding window of size m: check max sum among all windows</span>
+<span class="ty">bool</span> <span class="fn">isSub</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> m,<span class="ty">int</span> S){  <span class="cm">// TC: O(N)</span>
+    <span class="ty">int</span> N=arr.size();
+    <span class="ty">long long</span> ws=0;
+    <span class="kw">for</span>(<span class="ty">int</span> i=0;i&lt;m;i++) ws+=arr[i];   <span class="cm">// first window</span>
+    <span class="kw">if</span>(ws&gt;=S) <span class="kw">return</span> <span class="kw">true</span>;
+    <span class="kw">for</span>(<span class="ty">int</span> i=m;i&lt;N;i++){
+        ws+=arr[i]-arr[i-m];             <span class="cm">// slide window</span>
+        <span class="kw">if</span>(ws&gt;=S) <span class="kw">return</span> <span class="kw">true</span>;
+    }
+    <span class="kw">return</span> <span class="kw">false</span>;
+}
+
+<span class="ty">int</span> <span class="fn">smallest</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; arr,<span class="ty">int</span> S){  <span class="cm">// TC: O(N log N)</span>
+    <span class="ty">int</span> N=arr.size(),l=1,h=N,ans=-1;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=(l+h)/2;
+        <span class="kw">if</span>(isSub(arr,m,S)){ans=m;h=m-1;}  <span class="cm">// found → record, try smaller</span>
+        <span class="kw">else</span>{l=m+1;}
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 410 — Split Array Largest Sum (Painter's Partition variant)</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge hard">Hard</span></div></div>
+  <div class="prob-desc">Split array into k subarrays to minimize the largest subarray sum. Exactly same as Painter's Partition!</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">splitArray</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; nums,<span class="ty">int</span> k){
+    <span class="ty">long long</span> l=*max_element(nums.begin(),nums.end()),h=0;
+    <span class="kw">for</span>(<span class="ty">int</span> x:nums) h+=x;
+    <span class="ty">long long</span> ans=h;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">long long</span> m=l+(h-l)/2;
+        <span class="ty">int</span> parts=1; <span class="ty">long long</span> tw=0;
+        <span class="kw">for</span>(<span class="ty">int</span> x:nums){tw+=x;<span class="kw">if</span>(tw&gt;m){parts++;tw=x;}}
+        <span class="kw">if</span>(parts&lt;=k){ans=m;h=m-1;} <span class="kw">else</span> l=m+1;
+    }
+    <span class="kw">return</span> (<span class="ty">int</span>)ans;
+}
+<span class="cm">// Key: l=max(nums) not 1 — single element must fit in a subarray!</span></pre>
+</div>
+
+<div class="problem">
+  <div class="prob-head"><div class="prob-title">LeetCode 1011 — Capacity to Ship Packages Within D Days</div><div class="prob-meta"><span class="badge lc">LeetCode</span><span class="badge med">Medium</span></div></div>
+  <div class="prob-desc">Ship packages in order. Find minimum weight capacity to ship all in D days. Same pattern as Painter's Partition.</div>
+<pre class="code"><span class="ty">int</span> <span class="fn">shipWithinDays</span>(<span class="ty">vector</span>&lt;<span class="ty">int</span>&gt;&amp; weights,<span class="ty">int</span> days){
+    <span class="ty">int</span> l=*max_element(weights.begin(),weights.end());
+    <span class="ty">int</span> h=0; <span class="kw">for</span>(<span class="ty">int</span> x:weights) h+=x;
+    <span class="ty">int</span> ans=h;
+    <span class="kw">while</span>(l&lt;=h){
+        <span class="ty">int</span> m=l+(h-l)/2;
+        <span class="ty">int</span> d=1; <span class="ty">int</span> tw=0;
+        <span class="kw">for</span>(<span class="ty">int</span> x:weights){tw+=x;<span class="kw">if</span>(tw&gt;m){d++;tw=x;}}
+        <span class="kw">if</span>(d&lt;=days){ans=m;h=m-1;} <span class="kw">else</span> l=m+1;
+    }
+    <span class="kw">return</span> ans;
+}</pre>
+</div>
+
+<h3><span class="dot"></span>Summary — Binary Search Problem Recognition</h3>
+<table class="tbl">
+  <tr><th>Problem Type</th><th>SS Type</th><th>Pattern</th><th>Template</th></tr>
+  <tr><td>Find k in sorted arr</td><td>Real (arr indices)</td><td>3 cases: ==, &lt;, &gt;</td><td>Classic BS</td></tr>
+  <tr><td>Floor / First occurrence</td><td>Real</td><td>==: store ans, go left</td><td>Modified BS</td></tr>
+  <tr><td>Ceil / Last occurrence</td><td>Real</td><td>==: store ans, go right</td><td>Modified BS</td></tr>
+  <tr><td>Local Maxima</td><td>Real (unsorted!)</td><td>Go toward larger neighbor</td><td>Special BS</td></tr>
+  <tr><td>Minimize max / Maximize min</td><td>Imaginary [l..h]</td><td>FFFFTTTT or TTTTFFFF</td><td>BS on answer</td></tr>
+</table>
+`
+},
+];
+
+// ════ RENDER ════
+const navList = document.getElementById('navList');
+const content = document.getElementById('content');
+
+const groups = [
+  { label: 'Bit Manipulation & Math', range: [0,3] },
+  { label: 'Hashing', range: [4,5] },
+  { label: 'Recursion', range: [6,6] },
+  { label: 'Searching', range: [7,8] }
+];
+
+MODULES.forEach((m, i) => {
+  const mod = document.createElement('div');
+  mod.className = 'module' + (i===0?' active':'');
+  mod.id = 'mod-'+i;
+  mod.innerHTML = '<div class="module-head"><div class="module-eyebrow">Module '+m.num+'</div><h2>'+m.title+'</h2><p>'+m.desc+'</p></div>'+m.html;
+  content.appendChild(mod);
+});
+
+groups.forEach(g => {
+  const grp = document.createElement('div');
+  grp.className = 'nav-group';
+  grp.textContent = g.label;
+  navList.appendChild(grp);
+  for(let i=g.range[0];i<=g.range[1];i++){
+    const m = MODULES[i];
+    const item = document.createElement('div');
+    item.className = 'nav-item'+(i===0?' active':'');
+    item.innerHTML = '<span class="nav-num">'+m.num+'</span> '+m.title;
+    const idx = i;
+    item.onclick = () => showModule(idx);
+    navList.appendChild(item);
+  }
+});
+
+function showModule(i){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('mod-'+i).classList.add('active');
+  document.querySelectorAll('.nav-item')[i].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(window.innerWidth<=900) document.getElementById('sidebar').classList.remove('open');
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  document.getElementById('progBar').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistics, Decoded — Maths for Data Science</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#15213D; --ink-2:#1e2f52; --ink-soft:#3c4d70;
+  --paper:#F1F3F8; --paper-2:#F9FAFD; --card:#fff;
+  --blue:#2D6BE8; --blue-soft:#E4ECFD;
+  --violet:#6A4BE0; --violet-soft:#EEEAFB;
+  --amber:#D9870B; --amber-soft:#FBF0DA;
+  --teal:#0E9C73; --teal-soft:#E2F5EE;
+  --rose:#D23F5B; --rose-soft:#FBE7EB;
+  --rule:#DEE2EC; --rule-strong:#c4cad9;
+  --shadow:0 1px 2px rgba(21,33,61,.04),0 8px 24px rgba(21,33,61,.07);
+  --grid:rgba(45,107,232,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);
+  line-height:1.62;font-size:16px;-webkit-font-smoothing:antialiased;letter-spacing:-.003em}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--blue),var(--violet));z-index:200;transition:width .1s linear}
+
+.layout{display:flex;max-width:1500px;margin:0 auto}
+
+#sidebar{width:330px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+  background:var(--ink);color:#c4cee4;padding:30px 16px 60px 26px;border-right:1px solid #000}
+#sidebar::-webkit-scrollbar{width:8px}#sidebar::-webkit-scrollbar-thumb{background:#2a3a5e;border-radius:4px}
+.brand{margin-bottom:22px;padding-right:8px}
+.brand .kicker{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--blue);font-weight:600}
+.brand h1{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;line-height:1.15;
+  color:#fff;margin-top:7px;letter-spacing:-.01em}
+.brand .code{font-family:'JetBrains Mono',monospace;font-size:11px;color:#6a7aa0;margin-top:6px}
+.search-wrap{position:relative;margin-bottom:18px}
+#search{width:100%;padding:9px 12px 9px 32px;border-radius:9px;border:1px solid #28395e;
+  background:#1a2b4d;color:#e0e8f5;font-family:'Inter',sans-serif;font-size:13px}
+#search::placeholder{color:#5e6e92}
+#search:focus{outline:2px solid var(--blue);border-color:transparent}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+.nav-group{margin-bottom:6px}
+.nav-group>.grp-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.13em;
+  text-transform:uppercase;color:#5e6e92;font-weight:600;padding:14px 8px 7px;display:flex;align-items:flex-start;gap:8px;line-height:1.3}
+.nav-group>.grp-label .rn{color:var(--blue);font-weight:700}
+#sidebar nav a{display:block;color:#a6b2cd;text-decoration:none;font-size:13.5px;padding:6px 10px;
+  border-radius:7px;margin:1px 0;line-height:1.35;border-left:2px solid transparent;transition:background .12s,color .12s}
+#sidebar nav a:hover{background:#1c2d4d;color:#fff}
+#sidebar nav a.active{background:#1c2d4d;color:#fff;border-left-color:var(--blue);font-weight:500}
+.nav-hide{display:none !important}
+
+main{flex:1;min-width:0;padding:0 0 100px}
+.wrap{max-width:860px;margin:0 auto;padding:0 40px}
+
+.hero{position:relative;overflow:hidden;padding:70px 0 48px;
+  background:linear-gradient(180deg,var(--paper-2),var(--paper));border-bottom:1px solid var(--rule)}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:30px 30px;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 75% 5%,#000,transparent);
+  mask-image:radial-gradient(ellipse 80% 70% at 75% 5%,#000,transparent)}
+.hero .wrap{position:relative;z-index:1}
+.hero .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:16px}
+.hero h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(32px,4.6vw,50px);
+  line-height:1.04;letter-spacing:-.022em}
+.hero h2 em{font-style:normal;color:var(--blue)}
+.hero p.sub{font-size:17px;color:var(--ink-soft);max-width:580px;margin-top:18px;line-height:1.55}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.lchip{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);
+  border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:500;box-shadow:var(--shadow)}
+.lchip .dot{width:9px;height:9px;border-radius:50%}
+.lchip.why .dot{background:var(--violet)}
+.lchip.from .dot{background:var(--amber)}
+.lchip.terms .dot{background:var(--blue)}
+.lchip.ex .dot{background:var(--rose)}
+
+.partbar{margin:50px 0 6px;padding:18px 22px;border-radius:13px;background:var(--ink);color:#fff;position:relative;overflow:hidden}
+.partbar::after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:22px 22px}
+.partbar>*{position:relative;z-index:1}
+.partbar .pn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--blue);font-weight:700}
+.partbar h3{font-family:'Space Grotesk',sans-serif;font-size:23px;font-weight:600;margin-top:5px;color:#fff;letter-spacing:-.01em}
+
+section.fd{padding:38px 0 8px;border-bottom:1px solid var(--rule);scroll-margin-top:10px}
+.fd-head{display:flex;align-items:baseline;gap:13px;margin-bottom:6px}
+.fd-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--blue);flex-shrink:0;padding-top:5px}
+.fd-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:25px;letter-spacing:-.018em;line-height:1.13}
+.fd-sub{color:var(--ink-soft);font-size:15px;margin:8px 0 0}
+
+.fbig{background:var(--ink);border-radius:14px;padding:24px;margin:20px 0;position:relative;overflow:hidden;text-align:center}
+.fbig::after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:22px 22px}
+.fbig .katex{color:#fff !important;font-size:1.45em}
+.fbig .katex-display{margin:0;position:relative;z-index:1}
+.fbig .fname{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:13px}
+.fbig .fbig-txt{position:relative;z-index:1;color:#e8eefb;font-size:16px;font-weight:500;line-height:1.5}
+.fbig .fbig-txt b{color:#fff}
+
+.part{margin:16px 0}
+.plabel{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin-bottom:9px}
+.plabel::before{content:"";width:16px;height:3px;border-radius:2px}
+.plabel.why{color:var(--violet)}.plabel.why::before{background:var(--violet)}
+.plabel.from{color:var(--amber)}.plabel.from::before{background:var(--amber)}
+.plabel.terms{color:var(--blue)}.plabel.terms::before{background:var(--blue)}
+.plabel.ex{color:var(--rose)}.plabel.ex::before{background:var(--rose)}
+.part p{margin:7px 0;color:#26334d}
+.part strong{color:var(--ink);font-weight:600}
+ul.clean{list-style:none;margin:10px 0;padding:0}
+ul.clean li{padding:5px 0 5px 20px;position:relative;color:#26334d}
+ul.clean li::before{content:"";position:absolute;left:3px;top:13px;width:6px;height:6px;border-radius:50%;background:var(--blue);opacity:.55}
+
+.anatomy{background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin-top:6px}
+.term{display:flex;gap:14px;padding:13px 16px;border-top:1px solid var(--rule);align-items:flex-start}
+.term:first-child{border-top:none}
+.term:nth-child(even){background:var(--paper-2)}
+.sym{flex-shrink:0;min-width:52px;height:38px;padding:0 11px;border-radius:9px;background:var(--blue-soft);
+  border:1px solid #c8d8fb;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.sym .katex{font-size:1.0em;color:#1f4fb0}
+.sym.txt{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;color:#1f4fb0}
+.tdef{flex:1;min-width:0}
+.tdef .tname{font-weight:600;color:var(--ink);font-size:14.5px}
+.tdef .ttext{font-size:14px;color:#32405c;margin-top:2px}
+.tdef .tfind{font-size:12.8px;color:var(--ink-soft);margin-top:5px;padding-left:11px;border-left:2px solid var(--rule-strong)}
+.tdef .tfind b{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-right:6px}
+
+.mini{background:var(--rose-soft);border:1px solid #f1cdd5;border-radius:11px;padding:14px 18px;margin-top:6px}
+.mini p{margin:5px 0;font-size:14.5px;color:#3a2530}
+.mini .step b{color:var(--rose);font-family:'JetBrains Mono',monospace;font-size:12px;margin-right:5px}
+
+.callout{border-radius:10px;padding:13px 17px;margin:16px 0;font-size:14.6px;display:flex;gap:12px}
+.callout .ic{flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.key{background:var(--violet-soft);border:1px solid #ddd5f6}.key .ic{background:var(--violet);color:#fff}.key strong{color:#4a2db0}
+.warn{background:var(--amber-soft);border:1px solid #f1dcae}.warn .ic{background:var(--amber);color:#fff}.warn strong{color:#9a5d04}
+.tip{background:var(--blue-soft);border:1px solid #c8d8fb}.tip .ic{background:var(--blue);color:#fff}.tip strong{color:#1f4fb0}
+
+.tbl{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.tbl th{background:var(--ink);color:#fff;font-weight:600;text-align:left;padding:9px 13px;font-size:12.5px;font-family:'Space Grotesk',sans-serif}
+.tbl td{padding:8px 13px;border-top:1px solid var(--rule);vertical-align:top}
+.tbl tr:nth-child(even) td{background:var(--paper-2)}
+.tbl td:first-child{font-weight:500;color:var(--ink)}
+
+footer{max-width:860px;margin:0 auto;padding:40px 40px 0;color:var(--ink-soft);font-size:13.5px;text-align:center}
+footer .line{height:1px;background:var(--rule);margin-bottom:24px}
+
+#menuBtn{display:none}#overlay{display:none}
+@media(max-width:980px){
+  #sidebar{position:fixed;left:0;top:0;z-index:150;transform:translateX(-100%);transition:transform .25s ease;width:300px;box-shadow:0 0 40px rgba(0,0,0,.3)}
+  #sidebar.open{transform:translateX(0)}
+  #menuBtn{display:flex;align-items:center;gap:8px;position:fixed;top:14px;left:14px;z-index:160;
+    background:var(--ink);color:#fff;border:none;border-radius:10px;padding:10px 14px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+  #overlay.show{display:block;position:fixed;inset:0;background:rgba(15,25,45,.5);z-index:140}
+  .wrap{padding:0 22px}.hero{padding-top:78px}footer{padding-left:22px;padding-right:22px}
+}
+@media(max-width:560px){.fbig .katex{font-size:1.02em}.term{flex-wrap:wrap}}
+:focus-visible{outline:2.5px solid var(--blue);outline-offset:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="menuBtn">☰ Topics</button>
+<div id="overlay"></div>
+
+<div class="layout">
+<aside id="sidebar">
+  <div class="brand">
+    <div class="kicker">Companion · Decoded · Complete</div>
+    <h1>Statistics,<br>Explained</h1>
+    <div class="code">203MDS · basics → inference</div>
+  </div>
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7a8aae" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="search" type="text" placeholder="Search a concept…" autocomplete="off">
+  </div>
+
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">I.</span><span>Foundations &amp; Descriptive Stats</span></div>
+    <nav>
+      <a href="#foundations">What Statistics Is</a>
+      <a href="#central">Central Tendency</a>
+      <a href="#spread">Variability &amp; Spread</a>
+      <a href="#quartiles">Quartiles, IQR &amp; Outliers</a>
+      <a href="#shape">Distribution Shape</a>
+      <a href="#viz">Data Visualization</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">II.</span><span>Random Variables</span></div>
+    <nav>
+      <a href="#rv">Random Variables (PMF/PDF/CDF)</a>
+      <a href="#expect">Expectation E(X)</a>
+      <a href="#varx">Variance of an RV</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">III.</span><span>Probability Distributions</span></div>
+    <nav>
+      <a href="#bernoulli">Bernoulli</a>
+      <a href="#binomial">Binomial</a>
+      <a href="#poisson">Poisson</a>
+      <a href="#uniform">Discrete Uniform</a>
+      <a href="#exponential">Exponential</a>
+      <a href="#normal">Normal (Gaussian)</a>
+      <a href="#zscore">The Z-Score</a>
+      <a href="#lognormal">Log-Normal</a>
+      <a href="#chebyshev">Chebyshev's Theorem (in depth)</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">IV.</span><span>Analysis &amp; Transformations</span></div>
+    <nav>
+      <a href="#qq">QQ Plots</a>
+      <a href="#boxcox">Box-Cox Transform</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">V.</span><span>Inferential Foundations</span></div>
+    <nav>
+      <a href="#clt">Central Limit Theorem</a>
+      <a href="#se">Standard Error</a>
+      <a href="#ci-mean">CI for the Mean</a>
+      <a href="#ci-prop">CI for Proportions</a>
+      <a href="#ci-var">CI for Variance</a>
+    </nav>
+  </div>
+  <div class="nav-group">
+    <div class="grp-label"><span class="rn">VI.</span><span>Hypothesis Testing</span></div>
+    <nav>
+      <a href="#hypotheses">Null &amp; Alternative Hypotheses</a>
+      <a href="#pvalue">The p-value</a>
+      <a href="#ttest">One-Sample T-Test</a>
+      <a href="#twosample">Two-Sample T-Test (Pooled)</a>
+      <a href="#chi">Chi-Square Test</a>
+      <a href="#anova">ANOVA</a>
+    </nav>
+  </div>
+</aside>
+
+<main>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Volume III · the complete statistics reference</div>
+      <h2>Statistics,<br><em>one idea at a time.</em></h2>
+      <p class="sub">Everything from the course — descriptive basics, random variables, every distribution, and the full inference framework — taken apart the same way: what it's for, where it comes from, what each symbol means, and a worked example.</p>
+      <div class="legend">
+        <div class="lchip why"><span class="dot"></span>Why we need it</div>
+        <div class="lchip from"><span class="dot"></span>Where it comes from</div>
+        <div class="lchip terms"><span class="dot"></span>Each term decoded</div>
+        <div class="lchip ex"><span class="dot"></span>Try it</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+  <!-- ===================== PART I ===================== -->
+  <div class="partbar"><div class="pn">Part I</div><h3>Foundations &amp; Descriptive Statistics</h3></div>
+
+  <!-- FOUNDATIONS -->
+  <section class="fd" id="foundations">
+    <div class="fd-head"><span class="fd-num">S01</span><h3 class="fd-title">What Statistics Is</h3></div>
+    <p class="fd-sub">The vocabulary every later topic quietly depends on.</p>
+    <div class="fbig"><div class="fname">The two branches</div><div class="fbig-txt"><b>Descriptive</b> — summarize the data you have.<br><b>Inferential</b> — use a <b>sample</b> to conclude about a <b>population</b>.</div></div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Raw data is just a pile of numbers. Statistics is the discipline of turning that pile into understanding and into decisions made under uncertainty. Getting the basic vocabulary straight is what keeps the whole second half of the course (inference) from becoming confusing.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Two complementary jobs. <strong>Descriptive statistics</strong> describes data you already hold — means, charts, standard deviations — making no claim beyond it. <strong>Inferential statistics</strong> uses a manageable <em>sample</em> to draw conclusions about a much larger <em>population</em> you can't measure fully (via confidence intervals and hypothesis tests).</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym txt">N</span><div class="tdef"><div class="tname">Population</div><div class="ttext">The entire group of interest (size N).</div></div></div>
+        <div class="term"><span class="sym txt">n</span><div class="tdef"><div class="tname">Sample</div><div class="ttext">The subset you actually measure (size n).</div></div></div>
+        <div class="term"><span class="sym">$\mu,\sigma$</span><div class="tdef"><div class="tname">Parameter</div><div class="ttext">A number describing the population.</div></div></div>
+        <div class="term"><span class="sym">$\bar x,s$</span><div class="tdef"><div class="tname">Statistic</div><div class="ttext">A number describing the sample (used to estimate a parameter).</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>You measure 200 of 50,000 students to estimate the average score.</p>
+        <p class="step"><b>→</b> The 200 are the <b>sample</b>; their average is a <b>statistic</b>; the true 50,000 average is the <b>parameter</b> you're estimating.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CENTRAL TENDENCY -->
+  <section class="fd" id="central">
+    <div class="fd-head"><span class="fd-num">S02</span><h3 class="fd-title">Central Tendency</h3></div>
+    <p class="fd-sub">Three ways to describe the "center" — and when each one misleads.</p>
+    <div class="fbig"><div class="fname">Mean · Median · Mode</div>$$\bar{x}=\frac{\sum x}{n}\qquad \text{median = middle value}\qquad \text{mode = most frequent}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>You want a single number that represents the "typical" value of a dataset. But which one? The three measures answer that differently, and choosing wrong (mean on skewed data, say) gives a misleading picture.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>Mean</strong> — share the total equally among all points; it's the balance point, but every value (including outliers) tugs on it. <strong>Median</strong> — sort the data and take the positional middle; outliers can't drag it, so it's robust for skewed data. <strong>Mode</strong> — the value that occurs most often; the only one usable on categories.</p>
+      <ul class="clean"><li>If $n$ is <strong>odd</strong>, the median is the single middle value; if <strong>even</strong>, it's the average of the two middle values.</li></ul>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\bar x$</span><div class="tdef"><div class="tname">Mean</div><div class="ttext">Sum of values divided by the count.</div></div></div>
+        <div class="term"><span class="sym">$\sum x$</span><div class="tdef"><div class="tname">Sum of all values</div><div class="ttext">Add every data point.</div></div></div>
+        <div class="term"><span class="sym">$n$</span><div class="tdef"><div class="tname">Count</div><div class="ttext">Number of data points.</div></div></div>
+      </div>
+    </div>
+    <div class="callout key"><span class="ic">!</span><div><strong>Classic exam trap:</strong> "which measure is least affected by outliers?" → the <strong>median</strong>.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Data: {4, 5, 6, 7, 100}.</p>
+        <p class="step"><b>1</b> Mean $=\tfrac{122}{5}=24.4$ — dragged up by the outlier.</p>
+        <p class="step"><b>2</b> Median $=6$ — the honest center. This is why skewed data uses the median.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPREAD -->
+  <section class="fd" id="spread">
+    <div class="fd-head"><span class="fd-num">S03</span><h3 class="fd-title">Variability &amp; Spread</h3></div>
+    <p class="fd-sub">Center isn't enough — you also need how spread out the data is.</p>
+    <div class="fbig"><div class="fname">Variance → Std Dev → CV</div>$$\sigma^2=\frac{\sum(x-\mu)^2}{N}\qquad \sigma=\sqrt{\sigma^2}\qquad CV=\frac{\sigma}{\bar x}\times100\%$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Two classes can both average 70: one with everyone at 68–72, another split between 40 and 100. The mean can't tell them apart — you need a number for <strong>how far values typically sit from the mean</strong>.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Measure each point's distance from the mean, $(x-\mu)$. These cancel to zero if you average them directly, so <strong>square</strong> them first — that kills negatives and punishes big gaps more. Averaging the squared distances gives the <strong>variance</strong>. Since variance is in squared units, take the <strong>square root</strong> to return to the original units → the <strong>standard deviation</strong>. The <strong>range</strong> (max − min) and <strong>MAD</strong> ($\tfrac{\sum|x-\bar x|}{n}$) are simpler alternatives; the <strong>CV</strong> divides σ by the mean to compare spreads across different scales.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$x-\mu$</span><div class="tdef"><div class="tname">Deviation</div><div class="ttext">Distance of one value from the mean.</div><div class="tfind"><b>find it</b> subtract the mean from each value</div></div></div>
+        <div class="term"><span class="sym">$N$</span><div class="tdef"><div class="tname">Population size</div><div class="ttext">Sample version divides by $n-1$ instead.</div></div></div>
+        <div class="term"><span class="sym">$CV$</span><div class="tdef"><div class="tname">Coefficient of variation</div><div class="ttext">Spread as a % of the mean — unitless, comparable across datasets.</div></div></div>
+      </div>
+    </div>
+    <div class="callout warn"><span class="ic">!</span><div><strong>The n−1 rule:</strong> a <em>sample</em> variance divides by $n-1$ (not $N$). You spent one piece of information estimating the mean $\bar x$, so $n-1$ corrects for it. Whole group → N; sample → n−1.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Data {2, 4, 6} as a full population.</p>
+        <p class="step"><b>1</b> Mean $=4$; deviations $-2,0,+2$; squared $4,0,4$.</p>
+        <p class="step"><b>2</b> Variance $=\tfrac{8}{3}\approx2.67$; SD $=\sqrt{2.67}\approx1.63$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUARTILES -->
+  <section class="fd" id="quartiles">
+    <div class="fd-head"><span class="fd-num">S04</span><h3 class="fd-title">Quartiles, IQR &amp; Outliers</h3></div>
+    <p class="fd-sub">A spread measure that ignores extremes, plus the rule for flagging them.</p>
+    <div class="fbig"><div class="fname">IQR &amp; the outlier fences</div>$$IQR=Q_3-Q_1\qquad [\,Q_1-1.5\,IQR,\ \ Q_3+1.5\,IQR\,]$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The range is wrecked by a single freak value. We want a spread measure built on the <strong>bulk of the data</strong>, plus an objective rule to decide what counts as an outlier instead of eyeballing it.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Sort the data and cut it into four equal quarters; the cut points are $Q_1$ (25%), $Q_2$ (median), $Q_3$ (75%). The <strong>IQR</strong> is the width of the middle 50% — immune to extremes. For outliers, step <strong>1.5 IQRs</strong> beyond $Q_1$ and $Q_3$ to build "fences"; anything past them is unusually far from the bulk and gets flagged. (A <strong>percentile</strong> $P_k$ is the value below which $k\%$ of data falls; <strong>deciles</strong> split into ten.)</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$Q_1$</span><div class="tdef"><div class="tname">First quartile (25th pct)</div><div class="ttext">25% of data is below it.</div><div class="tfind"><b>find it</b> median of the lower half</div></div></div>
+        <div class="term"><span class="sym">$Q_3$</span><div class="tdef"><div class="tname">Third quartile (75th pct)</div><div class="ttext">75% of data is below it.</div><div class="tfind"><b>find it</b> median of the upper half</div></div></div>
+        <div class="term"><span class="sym">$1.5$</span><div class="tdef"><div class="tname">Fence multiplier</div><div class="ttext">Standard convention for "too far."</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$Q_1=20$, $Q_3=40$. Is 75 an outlier?</p>
+        <p class="step"><b>1</b> $IQR=20$; upper fence $=40+1.5(20)=70$.</p>
+        <p class="step"><b>2</b> $75>70$ → yes, an outlier.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHAPE -->
+  <section class="fd" id="shape">
+    <div class="fd-head"><span class="fd-num">S05</span><h3 class="fd-title">Distribution Shape</h3></div>
+    <p class="fd-sub">Skewness (asymmetry) and kurtosis (tailedness).</p>
+    <div class="fbig"><div class="fname">Two shape descriptors</div><div class="fbig-txt"><b>Skewness</b> — which way the tail points.<br><b>Kurtosis</b> — how heavy the tails are.</div></div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Mean and spread don't capture <em>shape</em>. Skewness and kurtosis tell you whether the data leans one way and whether it has fat tails (more extreme values than a normal would) — both crucial for choosing the right model and test.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>Skewness</strong> measures asymmetry. The mean gets "pulled toward the tail," so a long <em>right</em> tail makes mean &gt; median (right/positive skew); a long left tail makes mean &lt; median. <strong>Kurtosis</strong> measures peak/tail heaviness relative to a normal: <em>leptokurtic</em> (&gt;3) = sharp peak, heavy tails; <em>mesokurtic</em> (=3) = normal; <em>platykurtic</em> (&lt;3) = flat, thin tails.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <table class="tbl">
+        <tr><th>Shape</th><th>Tail</th><th>Order of measures</th></tr>
+        <tr><td>Right (positive) skew</td><td>Long tail on the right</td><td>Mode &lt; Median &lt; Mean</td></tr>
+        <tr><td>Symmetric</td><td>Balanced</td><td>Mean ≈ Median ≈ Mode</td></tr>
+        <tr><td>Left (negative) skew</td><td>Long tail on the left</td><td>Mean &lt; Median &lt; Mode</td></tr>
+      </table>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Income data: a few very high earners stretch the right tail.</p>
+        <p class="step"><b>→</b> Right-skewed, so <b>mean &gt; median</b> — which is why median income is usually reported.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VIZ -->
+  <section class="fd" id="viz">
+    <div class="fd-head"><span class="fd-num">S06</span><h3 class="fd-title">Data Visualization</h3></div>
+    <p class="fd-sub">Pick the chart that matches the question.</p>
+    <div class="fbig"><div class="fname">Match chart to job</div><div class="fbig-txt">shape → histogram · spread/outliers → box plot · categories → bar · relationship → scatter</div></div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A summary number hides structure a picture reveals at a glance — skew, clusters, outliers, relationships. The skill is choosing the chart whose strengths match what you're trying to see.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from / which to use</div>
+      <table class="tbl">
+        <tr><th>Chart</th><th>Shows</th><th>Use when</th></tr>
+        <tr><td>Histogram</td><td>Distribution shape of one variable</td><td>Checking spread / skew</td></tr>
+        <tr><td>Box plot</td><td>Median, quartiles, IQR, outliers</td><td>Comparing groups, spotting outliers</td></tr>
+        <tr><td>Bar chart</td><td>Counts per category</td><td>Categorical comparison</td></tr>
+        <tr><td>Scatter plot</td><td>Relationship between two variables</td><td>Checking correlation</td></tr>
+        <tr><td>Line chart</td><td>Trend over time</td><td>Time-series data</td></tr>
+      </table>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>You want to compare test-score spread across three classes and spot outliers.</p>
+        <p class="step"><b>→</b> Use side-by-side <b>box plots</b> — they show medians, IQRs, and outliers together.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART II ===================== -->
+  <div class="partbar"><div class="pn">Part II</div><h3>Random Variables</h3></div>
+
+  <!-- RV -->
+  <section class="fd" id="rv">
+    <div class="fd-head"><span class="fd-num">S07</span><h3 class="fd-title">Random Variables (PMF / PDF / CDF)</h3></div>
+    <p class="fd-sub">Turning random outcomes into numbers we can do math on.</p>
+    <div class="fbig"><div class="fname">Discrete vs Continuous</div>$$\text{PMF}: P(X{=}x)\quad\bigg|\quad \text{PDF}: f(x)\quad\bigg|\quad \text{CDF}: F(x)=P(X\le x)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>To reason about uncertainty with math, we attach numbers to random outcomes. A <strong>random variable</strong> is a function assigning a number to each outcome of an experiment — the bridge from "events" to algebra.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <ul class="clean">
+        <li><strong>Discrete RV</strong> — countable values (heads count, dice). Described by a <strong>PMF</strong> giving $P(X=x)$ for each value; all probabilities sum to 1.</li>
+        <li><strong>Continuous RV</strong> — any value in a range (height, time). Described by a <strong>PDF</strong> $f(x)$; the <em>area</em> under it over an interval is the probability, and the total area is 1.</li>
+        <li>The <strong>CDF</strong> $F(x)=P(X\le x)$ accumulates probability up to $x$ — it works for both types.</li>
+      </ul>
+    </div>
+    <div class="callout warn"><span class="ic">!</span><div><strong>Continuous subtlety:</strong> for a continuous RV, $P(X=\text{an exact value})=0$. Only intervals carry probability; the PDF height is a <em>density</em>, not a probability.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>A fair die is a discrete RV.</p>
+        <p class="step"><b>→</b> PMF: $P(X=x)=\tfrac16$ for $x=1,\dots,6$; CDF: $F(3)=P(X\le3)=\tfrac36=0.5$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPECT -->
+  <section class="fd" id="expect">
+    <div class="fd-head"><span class="fd-num">S08</span><h3 class="fd-title">Expectation E(X)</h3></div>
+    <p class="fd-sub">The "mean" of a random variable — the long-run average outcome.</p>
+    <div class="fbig"><div class="fname">Expected Value &amp; properties</div>$$E(X)=\sum x\,P(x)\qquad E(aX+b)=a\,E(X)+b$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>When outcomes are random (a bet, an insurance payout), you want to know the <strong>average result over many repeats</strong>. That long-run average is the expectation — the basis for deciding whether something is worth doing.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>An ordinary average weights all values equally, but random outcomes aren't equally likely. So we take a <strong>weighted average</strong>: each value is weighted by its probability. Frequent outcomes pull the average toward themselves; rare ones barely move it. Useful properties: $E(X+Y)=E(X)+E(Y)$ always, and $E(XY)=E(X)E(Y)$ only when independent.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$x$</span><div class="tdef"><div class="tname">A possible outcome</div><div class="ttext">Each value the RV can take.</div></div></div>
+        <div class="term"><span class="sym">$P(x)$</span><div class="tdef"><div class="tname">Its probability</div><div class="ttext">The weight; all $P(x)$ sum to 1.</div><div class="tfind"><b>find it</b> from the problem's probability table</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Pays ₹0 (prob 0.5), ₹10 (0.3), ₹100 (0.2).</p>
+        <p class="step"><b>1</b> $E(X)=0(0.5)+10(0.3)+100(0.2)=23$ → ₹23 average per play.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- VARX -->
+  <section class="fd" id="varx">
+    <div class="fd-head"><span class="fd-num">S09</span><h3 class="fd-title">Variance of a Random Variable</h3></div>
+    <p class="fd-sub">The shortcut formula — the squared-deviation idea, rearranged.</p>
+    <div class="fbig"><div class="fname">Variance — computational form</div>$$\operatorname{Var}(X)=E(X^2)-\big[E(X)\big]^2\qquad \operatorname{Var}(aX+b)=a^2\operatorname{Var}(X)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The expected value doesn't tell you how <strong>risky / spread out</strong> random outcomes are. A lottery and a savings account can share an expected value but differ wildly in risk — variance captures that.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>By definition variance is $E[(X-\mu)^2]$ — the expected squared deviation. Expanding that bracket and simplifying collapses to the easy-to-compute form <strong>$E(X^2)-[E(X)]^2$</strong>: "the mean of the squares minus the square of the mean." Note the shift rule: adding a constant $b$ doesn't change spread, so $\operatorname{Var}(aX+b)=a^2\operatorname{Var}(X)$.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$E(X^2)$</span><div class="tdef"><div class="tname">Mean of X-squared</div><div class="ttext">Square each outcome, then average.</div><div class="tfind"><b>find it</b> $\sum x^2 P(x)$</div></div></div>
+        <div class="term"><span class="sym">$[E(X)]^2$</span><div class="tdef"><div class="tname">Mean, then squared</div><div class="ttext">Average first, then square the single number.</div></div></div>
+      </div>
+    </div>
+    <div class="callout warn"><span class="ic">!</span><div><strong>Don't swap these:</strong> $E(X^2)$ = square then average; $[E(X)]^2$ = average then square. Their difference <em>is</em> the variance.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Given $E(X)=3$, $E(X^2)=13$.</p>
+        <p class="step"><b>1</b> $\operatorname{Var}(X)=13-3^2=4$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART III ===================== -->
+  <div class="partbar"><div class="pn">Part III</div><h3>Probability Distributions</h3></div>
+
+  <!-- BERNOULLI -->
+  <section class="fd" id="bernoulli">
+    <div class="fd-head"><span class="fd-num">S10</span><h3 class="fd-title">Bernoulli Distribution</h3></div>
+    <p class="fd-sub">The simplest random experiment: one trial, success or failure.</p>
+    <div class="fbig"><div class="fname">Bernoulli(p)</div>$$P(X{=}1)=p,\quad P(X{=}0)=1-p\qquad \text{Mean}=p,\quad \operatorname{Var}=p(1-p)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>It models any single yes/no event — a coin flip, a click, a pass/fail. It's also the atom that the Binomial is built from, so understanding it unlocks the next one.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Define success as 1 (probability $p$) and failure as 0 (probability $1-p$). The mean is $E(X)=1\cdot p+0\cdot(1-p)=p$. The variance works out to $p(1-p)$, which is <strong>largest at $p=0.5$</strong> (a 50/50 event is the most unpredictable) and shrinks to 0 as $p$ approaches 0 or 1 (near-certain events have little variability).</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$p$</span><div class="tdef"><div class="tname">Probability of success</div><div class="ttext">The chance the trial "works."</div><div class="tfind"><b>find it</b> given in the problem</div></div></div>
+        <div class="term"><span class="sym">$1{-}p$</span><div class="tdef"><div class="tname">Probability of failure</div><div class="ttext">Whatever's left over.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$X\sim$ Bernoulli(0.7).</p>
+        <p class="step"><b>1</b> Mean $=0.7$; Variance $=0.7\times0.3=0.21$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BINOMIAL -->
+  <section class="fd" id="binomial">
+    <div class="fd-head"><span class="fd-num">S11</span><h3 class="fd-title">Binomial Distribution</h3></div>
+    <p class="fd-sub">Counting successes in n independent yes/no trials.</p>
+    <div class="fbig"><div class="fname">Binomial(n, p)</div>$$P(X{=}k)=\binom{n}{k}p^{k}(1-p)^{n-k}\qquad \text{Mean}=np,\quad \operatorname{Var}=np(1-p)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Endless situations are "repeat a yes/no trial $n$ times": flip a coin 10 times, test 20 products, treat 5 patients. We want the probability of <strong>exactly $k$ successes</strong> — and counting by hand explodes, so the formula does it directly.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Three questions. <strong>(1)</strong> One specific pattern of $k$ successes and $n-k$ failures has probability $p^k(1-p)^{n-k}$ (independent trials multiply). <strong>(2)</strong> The successes can fall in many orders, and the number of arrangements is the combination $\binom{n}{k}$. <strong>(3)</strong> Add up all those equally-likely patterns: multiply the count by the per-pattern probability.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$n$</span><div class="tdef"><div class="tname">Number of trials</div><div class="ttext">How many repeats.</div></div></div>
+        <div class="term"><span class="sym">$k$</span><div class="tdef"><div class="tname">Successes you want</div><div class="ttext">The exact count asked about.</div></div></div>
+        <div class="term"><span class="sym">$\binom{n}{k}$</span><div class="tdef"><div class="tname">"n choose k"</div><div class="ttext">Number of ways to place k successes among n trials.</div><div class="tfind"><b>find it</b> $\dfrac{n!}{k!(n-k)!}$</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Fair coin, 4 tosses, P(exactly 2 heads). $n=4,k=2,p=0.5$.</p>
+        <p class="step"><b>1</b> $\binom42=6$; $(0.5)^2(0.5)^2=0.0625$.</p>
+        <p class="step"><b>2</b> $P=6\times0.0625=0.375=\tfrac38$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- POISSON -->
+  <section class="fd" id="poisson">
+    <div class="fd-head"><span class="fd-num">S12</span><h3 class="fd-title">Poisson Distribution</h3></div>
+    <p class="fd-sub">Counting rare events in a fixed window of time or space.</p>
+    <div class="fbig"><div class="fname">Poisson(λ)</div>$$P(X{=}k)=\frac{\lambda^{k}e^{-\lambda}}{k!}\qquad \boxed{\text{Mean}=\operatorname{Var}=\lambda}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Some things happen at a steady average rate but at random moments — calls per hour, breakdowns per week, typos per page. There's no fixed "$n$ trials"; events just arrive. The Poisson gives the probability of seeing exactly $k$ in one window.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Slice the window into a huge number of tiny instants, each with a tiny chance of an event — that's secretly a binomial with enormous $n$ and tiny $p$. Take the binomial limit as $n\to\infty$ with the average count $np=\lambda$ held fixed, and it simplifies into the Poisson formula. The constant $e$ falls out of that limit; the $k!$ is the leftover of the combination term.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\lambda$</span><div class="tdef"><div class="tname">Average rate (lambda)</div><div class="ttext">Expected events per window. Also equals the variance.</div><div class="tfind"><b>find it</b> "average X per period"</div></div></div>
+        <div class="term"><span class="sym">$e$</span><div class="tdef"><div class="tname">Euler's number ≈ 2.718</div><div class="ttext">A fixed constant from the limit.</div></div></div>
+        <div class="term"><span class="sym">$k!$</span><div class="tdef"><div class="tname">k factorial</div><div class="ttext">$k(k-1)\cdots1$; and $0!=1$.</div></div></div>
+      </div>
+    </div>
+    <div class="callout key"><span class="ic">!</span><div><strong>Signature fact:</strong> for Poisson the mean and variance are both λ. Asked constantly.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Breakdowns average λ=2/week. P(exactly 1)?</p>
+        <p class="step"><b>1</b> $P(1)=\tfrac{2^1 e^{-2}}{1!}=2e^{-2}\approx2(0.135)=0.271$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- UNIFORM -->
+  <section class="fd" id="uniform">
+    <div class="fd-head"><span class="fd-num">S13</span><h3 class="fd-title">Discrete Uniform Distribution</h3></div>
+    <p class="fd-sub">When every outcome in a set is equally likely.</p>
+    <div class="fbig"><div class="fname">PMF · Mean · Variance</div>$$P(X{=}x)=\frac{1}{N}\qquad \mu=\frac{a+b}{2}\qquad \sigma^2=\frac{N^2-1}{12}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The simplest distribution: a fair die, a random integer between two bounds. Whenever <strong>nothing makes one outcome likelier than another</strong>, this is the model — and it's the baseline for a chi-square goodness-of-fit test.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>PMF:</strong> $N$ equally likely values split total probability 1 evenly → $\tfrac1N$ each. <strong>Mean:</strong> for evenly spaced values the balance point is the midpoint $\tfrac{a+b}{2}$. <strong>Variance:</strong> working out $E(X^2)-[E(X)]^2$ for consecutive integers gives the tidy $\tfrac{N^2-1}{12}$ — spread grows with $N$, and 12 is the constant that drops out.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$N$</span><div class="tdef"><div class="tname">Number of values</div><div class="ttext">Count of equally likely outcomes.</div><div class="tfind"><b>find it</b> $N=b-a+1$</div></div></div>
+        <div class="term"><span class="sym">$a,b$</span><div class="tdef"><div class="tname">Smallest &amp; largest</div><div class="ttext">The bounds of the range.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Fair die: $a=1,b=6,N=6$.</p>
+        <p class="step"><b>1</b> Each face $\tfrac16$; Mean $=3.5$; Variance $=\tfrac{35}{12}\approx2.92$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPONENTIAL -->
+  <section class="fd" id="exponential">
+    <div class="fd-head"><span class="fd-num">S14</span><h3 class="fd-title">Exponential Distribution</h3></div>
+    <p class="fd-sub">The waiting time between random events arriving at a steady rate.</p>
+    <div class="fbig"><div class="fname">PDF · CDF · Mean · Variance</div>$$f(x)=\lambda e^{-\lambda x}\quad P(X\le x)=1-e^{-\lambda x}\quad \mu=\frac1\lambda\quad \sigma^2=\frac1{\lambda^2}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>If events happen at a constant rate (the Poisson setup), the <strong>time you wait until the next one</strong> is exponential. It's the standard model for lifetimes, service times, and time-to-failure.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>Mean $=\tfrac1\lambda$:</strong> at rate $\lambda$ per hour, the average gap is the reciprocal. <strong>CDF:</strong> accumulating the PDF from 0 to $x$ gives $1-e^{-\lambda x}$, so $e^{-\lambda x}$ is the chance of <em>still waiting</em> after time $x$. This decaying form produces the famous <strong>memoryless property</strong> — past waiting tells you nothing about future waiting.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\lambda$</span><div class="tdef"><div class="tname">Rate</div><div class="ttext">Average events per unit time.</div><div class="tfind"><b>find it</b> the Poisson rate</div></div></div>
+        <div class="term"><span class="sym">$e^{-\lambda x}$</span><div class="tdef"><div class="tname">"Still waiting" probability</div><div class="ttext">No event by time x.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Buses at λ=0.5/min. P(wait ≤ 3 min)?</p>
+        <p class="step"><b>1</b> $1-e^{-0.5(3)}=1-e^{-1.5}\approx1-0.223=0.777$. Mean wait $=1/0.5=2$ min.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NORMAL -->
+  <section class="fd" id="normal">
+    <div class="fd-head"><span class="fd-num">S15</span><h3 class="fd-title">Normal (Gaussian) Distribution</h3></div>
+    <p class="fd-sub">The bell curve — and what the intimidating PDF actually says.</p>
+    <div class="fbig"><div class="fname">Normal PDF</div>$$f(x)=\frac{1}{\sigma\sqrt{2\pi}}\,e^{-\frac{1}{2}\left(\frac{x-\mu}{\sigma}\right)^2}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The most important distribution in statistics. Heights, errors, and (via the CLT) <strong>sample means</strong> follow it. Z-scores, confidence intervals, and most tests assume normality, so this curve underpins all of inference.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>The exponent $-\tfrac12\left(\tfrac{x-\mu}{\sigma}\right)^2$:</strong> the inside is the <strong>z-score</strong> — distance from the mean in SD units. Squaring makes the curve symmetric; the minus sign makes probability <strong>decay</strong> away from $\mu$ → the bell shape. <strong>The front factor $\tfrac{1}{\sigma\sqrt{2\pi}}$</strong> is a <strong>normalizing constant</strong> that scales the total area to exactly 1.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mu$</span><div class="tdef"><div class="tname">Mean</div><div class="ttext">Center of the bell (the peak).</div></div></div>
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Standard deviation</div><div class="ttext">Width; bigger σ → flatter, wider curve.</div></div></div>
+        <div class="term"><span class="sym">$\frac{x-\mu}{\sigma}$</span><div class="tdef"><div class="tname">The z-score</div><div class="ttext">Distance from the mean in SD units.</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>Empirical Rule (normal data only):</strong> ≈68% within ±1σ, ≈95% within ±2σ, ≈99.7% within ±3σ. You rarely plug into the PDF by hand — you convert to a z-score and read a table.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>IQ: $\mu=100,\sigma=15$. How unusual is 130?</p>
+        <p class="step"><b>1</b> $z=\tfrac{130-100}{15}=2$ — two SDs above; only ~2.5% score higher.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Z SCORE -->
+  <section class="fd" id="zscore">
+    <div class="fd-head"><span class="fd-num">S16</span><h3 class="fd-title">The Z-Score</h3></div>
+    <p class="fd-sub">How many standard deviations a value sits from the mean.</p>
+    <div class="fbig"><div class="fname">Standardization</div>$$Z=\frac{x-\mu}{\sigma}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>"You scored 80" means nothing alone — 80 with a class mean of 50 is brilliant; with a mean of 95 it's poor. The z-score expresses a value by <strong>how unusual it is</strong> on a universal scale, letting you compare scores from completely different tests.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Two steps: <strong>(1) re-center</strong> by subtracting the mean, $x-\mu$, so 0 = average; <strong>(2) re-scale</strong> by dividing by the SD, so the unit becomes "one standard deviation." Now $Z=2$ means "two SDs above the mean" in <em>any</em> dataset — it converts any normal into the standard normal $N(0,1)$.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$x$</span><div class="tdef"><div class="tname">The raw value</div><div class="ttext">The data point being standardized.</div></div></div>
+        <div class="term"><span class="sym">$\mu$</span><div class="tdef"><div class="tname">Mean</div><div class="ttext">Center of the distribution.</div></div></div>
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Standard deviation</div><div class="ttext">The "ruler" — one unit of spread.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$x=80$, $\mu=50$, $\sigma=15$.</p>
+        <p class="step"><b>1</b> $Z=\tfrac{80-50}{15}=2$ — the score is 2 SDs above average.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG NORMAL -->
+  <section class="fd" id="lognormal">
+    <div class="fd-head"><span class="fd-num">S17</span><h3 class="fd-title">Log-Normal Distribution</h3></div>
+    <p class="fd-sub">For positive, right-skewed data — where the logarithm is normal.</p>
+    <div class="fbig"><div class="fname">Log-Normal PDF</div>$$f(x)=\frac{1}{x\sigma\sqrt{2\pi}}\,\exp\!\left(-\frac{(\ln x-\mu)^2}{2\sigma^2}\right),\quad x>0$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Many real quantities can't be negative and lean right: incomes, stock prices, file sizes. A normal fits badly (it allows negatives, is symmetric). The log-normal is built for <strong>positive, right-skewed</strong> data.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>The defining idea: $X$ is log-normal if <strong>$\ln(X)$ is normal</strong>. So you take the normal PDF and replace $x$ with $\ln x$ — hence $\ln x-\mu$ in the exponent. The extra <strong>$\tfrac1x$</strong> is the correction that always appears when transforming a variable through the log (it keeps total area 1). Because the log compresses large values, the original $X$ comes out stretched into a positive, right-skewed shape.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\ln x$</span><div class="tdef"><div class="tname">Natural log of x</div><div class="ttext">This is what's actually normal.</div></div></div>
+        <div class="term"><span class="sym">$\mu,\sigma$</span><div class="tdef"><div class="tname">Mean &amp; SD of $\ln x$</div><div class="ttext">Parameters on the log scale.</div></div></div>
+        <div class="term"><span class="sym">$\frac1x$</span><div class="tdef"><div class="tname">Transformation factor</div><div class="ttext">Keeps area = 1 after the log change of variable.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Quick check that data is log-normal.</p>
+        <p class="step"><b>1</b> Take $\ln$ of every value; if the result looks like a normal bell curve, the original is log-normal.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHEBYSHEV -->
+  <section class="fd" id="chebyshev">
+    <div class="fd-head"><span class="fd-num">S18</span><h3 class="fd-title">Chebyshev's Theorem — In Detail</h3></div>
+    <p class="fd-sub">A guarantee about spread that holds for <em>every</em> distribution, no matter its shape.</p>
+
+    <div class="fbig"><div class="fname">Chebyshev's Inequality — two equivalent forms</div>$$\underbrace{P\big(|X-\mu|<k\sigma\big)\ \ge\ 1-\frac{1}{k^2}}_{\text{fraction within }k\sigma}\qquad \underbrace{P\big(|X-\mu|\ge k\sigma\big)\ \le\ \frac{1}{k^2}}_{\text{fraction beyond }k\sigma}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The empirical rule (68-95-99.7) only works if the data is <strong>normal</strong>. But very often you don't know the shape, or it clearly isn't a bell curve. Chebyshev's theorem still gives you a <strong>guaranteed minimum</strong> percentage of data within $k$ standard deviations of the mean — for <em>any</em> distribution whatsoever. That universality is the whole point: it's the safety net for when you can't assume normality.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from — the actual derivation</div>
+      <p>It follows directly from the definition of variance. Variance is the average squared distance from the mean:</p>
+      $$\sigma^2=\sum (x-\mu)^2\,P(x)$$
+      <p><strong>Step 1 — split the data into two groups:</strong> points <em>near</em> the mean (within $k\sigma$) and points <em>far</em> from it (at least $k\sigma$ away). The total is just the two pieces added:</p>
+      $$\sigma^2=\underbrace{\sum_{|x-\mu|<k\sigma}(x-\mu)^2P(x)}_{\ge\,0}\ +\ \sum_{|x-\mu|\ge k\sigma}(x-\mu)^2P(x)$$
+      <p><strong>Step 2 — throw away the "near" group.</strong> It's a sum of non-negative things, so dropping it can only make the right side smaller — turning the equation into an inequality:</p>
+      $$\sigma^2\ \ge\ \sum_{|x-\mu|\ge k\sigma}(x-\mu)^2P(x)$$
+      <p><strong>Step 3 — use that the far points are genuinely far.</strong> Each is at least $k\sigma$ from the mean, so $(x-\mu)^2\ge(k\sigma)^2$. Replace and pull the constant out:</p>
+      $$\sigma^2\ \ge\ (k\sigma)^2\!\!\sum_{|x-\mu|\ge k\sigma}\!\!P(x)\ =\ k^2\sigma^2\cdot P\big(|X-\mu|\ge k\sigma\big)$$
+      <p><strong>Step 4 — divide both sides by $k^2\sigma^2$.</strong> The $\sigma^2$ cancels and the theorem drops out:</p>
+      $$\frac{1}{k^2}\ \ge\ P\big(|X-\mu|\ge k\sigma\big)$$
+      <p>That's the "beyond" form; subtracting from 1 gives the "within" form. The proof used <strong>no assumption about shape</strong> — only the variance — which is why it works everywhere, and also why it's <em>loose</em> (the real percentage is usually much higher).</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mu$</span><div class="tdef"><div class="tname">Mean</div><div class="ttext">The center distances are measured from.</div></div></div>
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Standard deviation</div><div class="ttext">One "step" of distance from the mean.</div></div></div>
+        <div class="term"><span class="sym">$k$</span><div class="tdef"><div class="tname">Number of standard deviations</div><div class="ttext">How many σ-steps out. <strong>Must be &gt; 1</strong> or the bound is useless.</div><div class="tfind"><b>find it</b> $k=\dfrac{\text{distance from }\mu\text{ to the endpoint}}{\sigma}$</div></div></div>
+        <div class="term"><span class="sym">$1-\frac{1}{k^2}$</span><div class="tdef"><div class="tname">Guaranteed minimum fraction</div><div class="ttext">Smallest possible proportion within $k$ SDs.</div></div></div>
+      </div>
+    </div>
+
+    <div class="callout tip"><span class="ic">i</span><div><strong>The two question types, and how to set them up:</strong><br>
+    • <strong>"At least what % lies in [a, b]?"</strong> → find $k=\dfrac{b-\mu}{\sigma}$ (interval symmetric about $\mu$), answer $1-\tfrac{1}{k^2}$.<br>
+    • <strong>"Between which two values do at least P% lie?"</strong> → solve $1-\tfrac{1}{k^2}=P$ for $k$, interval is $\big(\mu-k\sigma,\ \mu+k\sigma\big)$.</div></div>
+
+    <div class="part"><div class="plabel terms" style="color:var(--blue)">The k-table — worth memorizing</div>
+      <table class="tbl">
+        <tr><th>k (within ±kσ)</th><th>Minimum within $1-\tfrac{1}{k^2}$</th><th>Maximum beyond $\tfrac{1}{k^2}$</th></tr>
+        <tr><td>k = 1</td><td>0% (useless — why k must exceed 1)</td><td>100%</td></tr>
+        <tr><td>k = 1.5</td><td>$1-\tfrac{1}{2.25}=55.6\%$</td><td>44.4%</td></tr>
+        <tr><td>k = 2</td><td>$1-\tfrac14=75\%$</td><td>25%</td></tr>
+        <tr><td>k = 2.5</td><td>$1-\tfrac{1}{6.25}=84\%$</td><td>16%</td></tr>
+        <tr><td>k = 3</td><td>$1-\tfrac19=88.9\%$</td><td>11.1%</td></tr>
+        <tr><td>k = 4</td><td>$1-\tfrac{1}{16}=93.75\%$</td><td>6.25%</td></tr>
+      </table>
+    </div>
+
+    <div class="callout warn"><span class="ic">!</span><div><strong>Chebyshev vs the Empirical Rule.</strong> At $k=2$: the empirical rule says ≈95% — but only for <em>normal</em> data; Chebyshev guarantees ≥75% for <em>any</em> data. Chebyshev is weaker but universal.</div></div>
+
+    <div class="part"><div class="plabel ex">Worked example — bolt lengths (distribution unknown)</div>
+      <p>A factory's bolts have mean length $\mu=50$ mm and standard deviation $\sigma=2$ mm. The shape is <strong>not known</strong>, so the empirical rule can't be used — but Chebyshev always can.</p>
+      <div class="mini">
+        <p><strong>(a) At least what percentage of bolts are between 44 mm and 56 mm?</strong></p>
+        <p class="step"><b>1</b> Symmetric about 50; distance to an endpoint $=56-50=6$ mm.</p>
+        <p class="step"><b>2</b> $k=\tfrac{6}{2}=3$.</p>
+        <p class="step"><b>3</b> $1-\tfrac{1}{3^2}=1-\tfrac19=0.889$.</p>
+        <p class="step"><b>→</b> <strong>At least 88.9%</strong> lie between 44 and 56 mm — regardless of shape.</p>
+      </div>
+      <div class="mini">
+        <p><strong>(b) Between which two lengths are at least 75% guaranteed to fall?</strong></p>
+        <p class="step"><b>1</b> $1-\tfrac{1}{k^2}=0.75\Rightarrow \tfrac{1}{k^2}=0.25\Rightarrow k=2$.</p>
+        <p class="step"><b>2</b> Interval $=\mu\pm k\sigma=50\pm2(2)=50\pm4$.</p>
+        <p class="step"><b>→</b> <strong>At least 75%</strong> lie between <strong>46 mm and 54 mm</strong>.</p>
+      </div>
+      <div class="mini">
+        <p><strong>(c) At most what percentage differ from the mean by 8 mm or more?</strong></p>
+        <p class="step"><b>1</b> $k=\tfrac{8}{2}=4$.</p>
+        <p class="step"><b>2</b> Beyond form: $\tfrac{1}{k^2}=\tfrac{1}{16}=0.0625$.</p>
+        <p class="step"><b>→</b> <strong>At most 6.25%</strong> are 8 mm or more from 50 (outside 42–58 mm).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART IV ===================== -->
+  <div class="partbar"><div class="pn">Part IV</div><h3>Distribution Analysis &amp; Transformations</h3></div>
+
+  <!-- QQ -->
+  <section class="fd" id="qq">
+    <div class="fd-head"><span class="fd-num">S19</span><h3 class="fd-title">QQ Plots (Quantile–Quantile)</h3></div>
+    <p class="fd-sub">A visual test for "does my data follow this distribution?"</p>
+    <div class="fbig"><div class="fname">What you plot</div><div class="fbig-txt">pairs of percentiles $(x_i,\ y_i)$ — <b>theoretical</b> vs <b>your data's</b> quantile.<br>A <b>straight line</b> ⟹ same distribution type.</div></div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Before using methods that assume normality (z-tests, CIs, ANOVA), check whether the data actually is roughly normal. A QQ plot is the fast visual way — and reveals skew or heavy tails at a glance.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>A <strong>quantile</strong> is a value below which a given fraction of data falls. Line up your data's quantiles against the quantiles a reference distribution (usually normal) would produce, plotting them as points $(x_i,y_i)$. If both are the <strong>same type</strong>, the quantiles rise together → points fall on a <strong>straight diagonal</strong>. Curves away from the line reveal exactly how the data differs (bending ends = heavy tails, C-shape = skew).</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$x_i$</span><div class="tdef"><div class="tname">Theoretical quantile</div><div class="ttext">What the reference distribution predicts for that percentile.</div></div></div>
+        <div class="term"><span class="sym">$y_i$</span><div class="tdef"><div class="tname">Sample quantile</div><div class="ttext">The matching percentile from your data.</div><div class="tfind"><b>find it</b> sort the data, read off percentiles</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>You suspect exam scores are normal.</p>
+        <p class="step"><b>→</b> Points on a straight line → treat as normal; an upward-curving tail → some unusually high scores.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOX COX -->
+  <section class="fd" id="boxcox">
+    <div class="fd-head"><span class="fd-num">S20</span><h3 class="fd-title">Box-Cox Transformation</h3></div>
+    <p class="fd-sub">A tunable "dial" that reshapes skewed data toward normal.</p>
+    <div class="fbig"><div class="fname">Box-Cox power transform</div>$$y_i=\begin{cases}\dfrac{x_i^{\lambda}-1}{\lambda}, & \lambda\neq0\\[8pt]\ln(x_i), & \lambda=0\end{cases}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Many methods need normal data, but real data is often skewed. Box-Cox gives a <strong>single parameter $\lambda$ you tune</strong> to transform non-Gaussian data into something close to normal — unlocking the tools that assume normality.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>It's a family of <strong>power transforms</strong> with one knob $\lambda$: $\lambda=2$ squares, $\lambda=\tfrac12$ square-roots, $\lambda=-1$ takes a reciprocal. You search for the $\lambda$ that makes the result most symmetric. The clever part: as $\lambda\to0$, $\tfrac{x^\lambda-1}{\lambda}$ smoothly approaches $\ln(x)$ — so the log transform is the natural limiting case and the whole family connects seamlessly.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$x_i$</span><div class="tdef"><div class="tname">Original value</div><div class="ttext">Must be positive.</div></div></div>
+        <div class="term"><span class="sym">$\lambda$</span><div class="tdef"><div class="tname">Transform parameter</div><div class="ttext">The dial setting the bend.</div><div class="tfind"><b>find it</b> chosen to maximize normality (software searches)</div></div></div>
+        <div class="term"><span class="sym">$y_i$</span><div class="tdef"><div class="tname">Transformed value</div><div class="ttext">The new, more-normal data.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Right-skewed income, trying $\lambda=0$ (log case).</p>
+        <p class="step"><b>1</b> Replace each income $x$ with $\ln(x)$ → the long tail compresses, distribution becomes far more symmetric.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART V ===================== -->
+  <div class="partbar"><div class="pn">Part V</div><h3>Inferential Foundations</h3></div>
+
+  <!-- CLT -->
+  <section class="fd" id="clt">
+    <div class="fd-head"><span class="fd-num">S21</span><h3 class="fd-title">Central Limit Theorem (CLT)</h3></div>
+    <p class="fd-sub">Why sample means are normal even when the data isn't.</p>
+    <div class="fbig"><div class="fname">CLT — the key results</div>$$\mu_{\bar{x}}=\mu\qquad \sigma^2_{\bar{x}}=\frac{\sigma^2}{n}\qquad (n\ge30\Rightarrow \bar{x}\ \text{approx. normal})$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>It's the foundation that makes inference possible. The CLT is why we can build confidence intervals and run z-tests on a mean <strong>even with no idea of the population's shape</strong>.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Take many samples and compute each mean. As $n$ grows: the averages <strong>center on the truth</strong> ($\mu_{\bar x}=\mu$); they <strong>tighten up</strong> because averaging cancels random highs and lows, so their variance shrinks to $\tfrac{\sigma^2}{n}$ (square root → standard error $\tfrac{\sigma}{\sqrt n}$); and their <em>shape</em> becomes a <strong>normal bell curve</strong> once $n\ge30$, regardless of the population's shape. That convergence to normality is the theorem.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mu_{\bar x}$</span><div class="tdef"><div class="tname">Mean of the sample means</div><div class="ttext">Equals the population mean μ.</div></div></div>
+        <div class="term"><span class="sym">$\sigma^2_{\bar x}$</span><div class="tdef"><div class="tname">Variance of the sample mean</div><div class="ttext">$\sigma^2/n$ — shrinks as n grows.</div><div class="tfind"><b>find it</b> divide population variance by n</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\mu=50,\sigma=12,n=36$.</p>
+        <p class="step"><b>1</b> Sample means center at 50; variance $=\tfrac{144}{36}=4$, so SE $=2$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SE -->
+  <section class="fd" id="se">
+    <div class="fd-head"><span class="fd-num">S22</span><h3 class="fd-title">Standard Error</h3></div>
+    <p class="fd-sub">How much a sample mean wobbles — and why bigger samples wobble less.</p>
+    <div class="fbig"><div class="fname">Standard Error of the Mean</div>$$SE=\frac{\sigma}{\sqrt{n}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Take one sample, get a mean; take another, get a slightly different one. Sample means bounce around the true mean. Standard error measures that bounce — the key ingredient for confidence intervals and every test about a mean.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Averaging $n$ values makes the random ups and downs <strong>partly cancel</strong> — one value too high is offset by another too low. More values → more cancellation → steadier average. The math (variances add, then square-root) shows the wobble shrinks in proportion to <strong>$\sqrt n$</strong>, not $n$ — so to halve your error you need <em>four times</em> the data. That's why the square root is there.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Population SD</div><div class="ttext">Spread of individual values (use sample SD $s$ if unknown).</div></div></div>
+        <div class="term"><span class="sym">$\sqrt n$</span><div class="tdef"><div class="tname">Root of the sample size</div><div class="ttext">Why large samples give precise means.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\sigma=12$, $n=36$.</p>
+        <p class="step"><b>1</b> $SE=\tfrac{12}{\sqrt{36}}=\tfrac{12}{6}=2$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CI MEAN -->
+  <section class="fd" id="ci-mean">
+    <div class="fd-head"><span class="fd-num">S23</span><h3 class="fd-title">Confidence Interval for the Mean</h3></div>
+    <p class="fd-sub">A range for the true mean — using t when σ is unknown.</p>
+    <div class="fbig"><div class="fname">CI &amp; Margin of Error</div>$$(\bar{x}-E,\ \bar{x}+E)\qquad E=t_{\alpha/2}\cdot\frac{s}{\sqrt{n}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A single sample mean is almost never exactly right. A CI reports an honest <strong>range</strong> likely to contain the true mean, with a stated confidence. When σ is <strong>unknown</strong> (the usual case), we use the t-distribution.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Start at $\bar x$ and reach out by a <strong>margin $E$</strong> each side. The margin = a <strong>critical value $t_{\alpha/2}$</strong> (how wide for your confidence level) times the <strong>standard error $\tfrac{s}{\sqrt n}$</strong> (using the sample SD $s$). We use $t$ rather than $Z$ because estimating σ with $s$ adds uncertainty — the t-distribution has slightly heavier tails to account for it, especially at small $n$; as $n$ grows, $t\to Z$.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$t_{\alpha/2}$</span><div class="tdef"><div class="tname">t critical value</div><div class="ttext">From the t-table at df = n−1.</div><div class="tfind"><b>find it</b> t-table, df = n−1, area α/2 per tail</div></div></div>
+        <div class="term"><span class="sym">$s$</span><div class="tdef"><div class="tname">Sample standard deviation</div><div class="ttext">Stands in for the unknown σ.</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>"95% confident"</strong> means the <em>method</em> captures the true mean 95% of the time across repeated samples — not "95% chance μ is in this one interval."</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$n=25,\bar x=100,s=10$, 95% CI (t at df 24 ≈ 2.064).</p>
+        <p class="step"><b>1</b> SE $=\tfrac{10}{5}=2$; $E=2.064\times2=4.13$.</p>
+        <p class="step"><b>2</b> CI $=100\pm4.13=(95.87,\ 104.13)$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CI PROP -->
+  <section class="fd" id="ci-prop">
+    <div class="fd-head"><span class="fd-num">S24</span><h3 class="fd-title">Confidence Interval for Proportions</h3></div>
+    <p class="fd-sub">A range for a true percentage — polls, defect rates, click rates.</p>
+    <div class="fbig"><div class="fname">CI for a Proportion</div>$$\hat{p}\ \pm\ Z_c\sqrt{\frac{\hat{p}\,\hat{q}}{n}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Often the quantity is a <strong>proportion</strong>, not a mean: voter support, defect rate, click-through rate. This interval gives a range for the true proportion — the math behind a poll's "margin of error."</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Same skeleton: <strong>estimate ± (critical value × standard error)</strong>. The estimate is $\hat p$. The standard error of a proportion is <strong>$\sqrt{\tfrac{\hat p\hat q}{n}}$</strong> (from the Bernoulli variance $p(1-p)$, divided by $n$, square-rooted). Multiply by the Z critical value and add/subtract from $\hat p$.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\hat p$</span><div class="tdef"><div class="tname">Sample proportion</div><div class="ttext">Fraction with the trait.</div><div class="tfind"><b>find it</b> successes ÷ n</div></div></div>
+        <div class="term"><span class="sym">$\hat q$</span><div class="tdef"><div class="tname">Failure proportion</div><div class="ttext">$\hat q=1-\hat p$.</div></div></div>
+        <div class="term"><span class="sym">$Z_c$</span><div class="tdef"><div class="tname">Z critical value</div><div class="ttext">1.96 for 95%.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Poll of $n=400$, 240 say "yes." 95% CI?</p>
+        <p class="step"><b>1</b> $\hat p=0.6,\hat q=0.4$; SE $=\sqrt{\tfrac{0.24}{400}}\approx0.0245$.</p>
+        <p class="step"><b>2</b> $0.6\pm1.96(0.0245)=0.6\pm0.048=(0.552,\ 0.648)$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CI VAR -->
+  <section class="fd" id="ci-var">
+    <div class="fd-head"><span class="fd-num">S25</span><h3 class="fd-title">Confidence Interval for Variance</h3></div>
+    <p class="fd-sub">A range for the true variability — built on the chi-square distribution.</p>
+    <div class="fbig"><div class="fname">CI for σ²</div>$$\frac{(n-1)s^2}{\chi^2_{\alpha/2}}\ <\ \sigma^2\ <\ \frac{(n-1)s^2}{\chi^2_{1-\alpha/2}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Sometimes the <strong>spread itself</strong> is what matters — the consistency of a process, the volatility of returns. This interval estimates the true population variance $\sigma^2$ from a sample.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Key fact: $\tfrac{(n-1)s^2}{\sigma^2}$ follows a <strong>chi-square distribution</strong> with $n-1$ degrees of freedom. Because chi-square is <strong>not symmetric</strong>, there's no simple "± margin." Instead grab the two cutoffs leaving $\tfrac{\alpha}{2}$ in each tail, then rearrange to <strong>bracket $\sigma^2$</strong>. The larger cutoff ends up under the lower bound, which is why the subscripts look flipped.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$s^2$</span><div class="tdef"><div class="tname">Sample variance</div><div class="ttext">Your point estimate of spread.</div><div class="tfind"><b>find it</b> $\tfrac{\sum(x-\bar x)^2}{n-1}$</div></div></div>
+        <div class="term"><span class="sym">$\chi^2_{\alpha/2}$</span><div class="tdef"><div class="tname">Upper cutoff</div><div class="ttext">Right-tail value; sits under the lower bound.</div><div class="tfind"><b>find it</b> chi-square table, df = n−1</div></div></div>
+        <div class="term"><span class="sym">$\chi^2_{1-\alpha/2}$</span><div class="tdef"><div class="tname">Lower cutoff</div><div class="ttext">Left-tail value; sits under the upper bound.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$n=10,s^2=16$ (df 9; $\chi^2_{0.025}=19.02$, $\chi^2_{0.975}=2.70$).</p>
+        <p class="step"><b>1</b> $(n-1)s^2=144$.</p>
+        <p class="step"><b>2</b> Lower $=\tfrac{144}{19.02}\approx7.6$; Upper $=\tfrac{144}{2.70}\approx53.3$ → CI $(7.6,\ 53.3)$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PART VI ===================== -->
+  <div class="partbar"><div class="pn">Part VI</div><h3>Hypothesis Testing Framework</h3></div>
+
+  <!-- HYPOTHESES -->
+  <section class="fd" id="hypotheses">
+    <div class="fd-head"><span class="fd-num">S26</span><h3 class="fd-title">Null &amp; Alternative Hypotheses</h3></div>
+    <p class="fd-sub">The two competing claims every test is built around.</p>
+    <div class="fbig"><div class="fname">The two hypotheses</div>$$H_0:\ \mu=57\qquad\text{vs}\qquad H_1:\ \mu\neq57$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A hypothesis test is a structured way to choose between two stories using data. You state them precisely <em>before</em> testing, so the test has a clear question and the result can't be fudged afterward.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>$H_0$ (null)</strong> is the <strong>status quo</strong> — "nothing unusual," assumed true until data forces otherwise (e.g. "mean is 57"). <strong>$H_1$ (alternative)</strong> is the <strong>research claim</strong> you're trying to demonstrate (e.g. "mean is <em>not</em> 57"). Like a courtroom: $H_0$ is "innocent" (presumed); strong evidence is needed to reject it. You never "prove $H_0$" — you only fail to reject it.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$H_0$</span><div class="tdef"><div class="tname">Null hypothesis</div><div class="ttext">Status-quo claim; always contains "=".</div></div></div>
+        <div class="term"><span class="sym">$H_1$</span><div class="tdef"><div class="tname">Alternative hypothesis</div><div class="ttext">The research claim ($\neq$, &gt;, or &lt;).</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>One- vs two-tailed:</strong> $H_1:\mu\neq57$ is two-tailed; $H_1:\mu>57$ or $<57$ is one-tailed. The form of $H_1$ decides which tails you test.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Claim: a new method changes the average score from 57.</p>
+        <p class="step"><b>→</b> $H_0:\mu=57$ (no change); $H_1:\mu\neq57$ (it changes the mean).</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- P VALUE -->
+  <section class="fd" id="pvalue">
+    <div class="fd-head"><span class="fd-num">S27</span><h3 class="fd-title">The p-value</h3></div>
+    <p class="fd-sub">How surprising your data would be if the null were true.</p>
+    <div class="fbig"><div class="fname">Decision rule</div>$$\text{p-value}\le\alpha\ \Rightarrow\ \text{reject } H_0$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The p-value turns your test statistic into a single interpretable probability that decides whether to reject $H_0$. It's reported by virtually every test.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Assume $H_0$ is true, then ask: <strong>how likely is data at least as extreme as what I observed?</strong> That probability is the p-value. <strong>Small</strong> → your data would be a big coincidence under $H_0$, so reject it. <strong>Large</strong> → consistent with $H_0$, so don't. Compare to a pre-set threshold $\alpha$ (usually 0.05).</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym txt">p</span><div class="tdef"><div class="tname">p-value</div><div class="ttext">Probability of data this extreme (or more) assuming $H_0$ true.</div><div class="tfind"><b>find it</b> from the test statistic via a Z/t/χ² table</div></div></div>
+        <div class="term"><span class="sym">$\alpha$</span><div class="tdef"><div class="tname">Significance level</div><div class="ttext">Your threshold (0.05) — also the Type I error rate.</div></div></div>
+      </div>
+    </div>
+    <div class="callout warn"><span class="ic">!</span><div><strong>Common misreading:</strong> the p-value is <em>not</em> "the probability that $H_0$ is true." It's the probability of the <em>data</em> given $H_0$.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Test gives p = 0.03, α = 0.05.</p>
+        <p class="step"><b>1</b> $0.03\le0.05$ → reject $H_0$; statistically significant.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- T TEST -->
+  <section class="fd" id="ttest">
+    <div class="fd-head"><span class="fd-num">S28</span><h3 class="fd-title">One-Sample T-Test Statistic</h3></div>
+    <p class="fd-sub">Testing a mean when the sample is small and σ is unknown.</p>
+    <div class="fbig"><div class="fname">t statistic</div>$$t_{cal}=\frac{\bar{x}-\mu}{s/\sqrt{n}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>You want to test a claim about a mean, but with a <strong>small sample</strong> and <strong>unknown σ</strong> — the realistic case. The t-test handles exactly this by standardizing how far your sample mean is from the claimed value.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>It's a <strong>signal-to-noise ratio</strong>. The top $\bar x-\mu$ is the <strong>signal</strong>: how far your mean is from the $H_0$ value. The bottom $\tfrac{s}{\sqrt n}$ is the <strong>noise</strong>: the standard error. Dividing tells you <strong>how many standard errors the gap is</strong> — a big $t$ means strong evidence against $H_0$. It uses the sample SD $s$, so it's compared against the t-distribution with $n-1$ df.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\bar x$</span><div class="tdef"><div class="tname">Sample mean</div><div class="ttext">What you observed.</div></div></div>
+        <div class="term"><span class="sym">$\mu$</span><div class="tdef"><div class="tname">Claimed mean (from $H_0$)</div><div class="ttext">The value you're testing against.</div></div></div>
+        <div class="term"><span class="sym">$s/\sqrt n$</span><div class="tdef"><div class="tname">Standard error</div><div class="ttext">The "noise" — natural wobble of the mean.</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>Z-test vs T-test:</strong> if σ is <em>known</em> (or n is large), the same idea uses $Z=\tfrac{\bar x-\mu}{\sigma/\sqrt n}$ and the normal table instead. Use t when σ is unknown and n is small.</div></div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$H_0:\mu=50$. Sample $\bar x=53,s=6,n=16$.</p>
+        <p class="step"><b>1</b> SE $=\tfrac{6}{4}=1.5$; $t=\tfrac{53-50}{1.5}=2.0$ → 2 SEs above 50; compare to t-critical at df 15.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TWO SAMPLE -->
+  <section class="fd" id="twosample">
+    <div class="fd-head"><span class="fd-num">S29</span><h3 class="fd-title">Two-Sample T-Test (Pooled Variance)</h3></div>
+    <p class="fd-sub">Comparing two group means when their variances are assumed equal.</p>
+    <div class="fbig"><div class="fname">Pooled variance &amp; the t statistic</div>$$s_p^2=\frac{(n_1-1)s_1^2+(n_2-1)s_2^2}{n_1+n_2-2}\qquad t=\frac{\bar{x}_1-\bar{x}_2}{s_p\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Constantly you compare <strong>two groups</strong>: treatment vs control, method A vs B, before vs after. This test decides whether the difference between means is real or just noise. When both groups share a variance, the pooled version is the right tool.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p><strong>Pooled variance:</strong> if both groups truly share one variance, combine both samples' information into one best estimate rather than use either alone — a <strong>weighted average</strong> of the two sample variances, each weighted by its df ($n-1$). <strong>The t statistic:</strong> same signal-to-noise idea — the top is the difference between group means, the bottom is the standard error of that difference, built from the pooled variance across both sample sizes.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$s_1^2,s_2^2$</span><div class="tdef"><div class="tname">The two sample variances</div><div class="ttext">Spread within each group.</div></div></div>
+        <div class="term"><span class="sym">$n_1,n_2$</span><div class="tdef"><div class="tname">The two sample sizes</div><div class="ttext">How many in each group.</div></div></div>
+        <div class="term"><span class="sym">$s_p^2$</span><div class="tdef"><div class="tname">Pooled variance</div><div class="ttext">Combined, df-weighted variance estimate.</div><div class="tfind"><b>find it</b> df for the test is $n_1+n_2-2$</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Group 1: $n_1=10,s_1^2=4$. Group 2: $n_2=12,s_2^2=6$.</p>
+        <p class="step"><b>1</b> $s_p^2=\tfrac{9(4)+11(6)}{20}=\tfrac{102}{20}=5.1$; use $s_p\approx2.26$ with the two means.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHI SQUARE -->
+  <section class="fd" id="chi">
+    <div class="fd-head"><span class="fd-num">S30</span><h3 class="fd-title">The Chi-Square Test</h3></div>
+    <p class="fd-sub">Measuring how far observed counts stray from what you expected.</p>
+    <div class="fbig"><div class="fname">Chi-Square statistic</div>$$\chi^2=\sum\frac{(O-E)^2}{E}\qquad \text{df}=k-1\ \text{(fit)}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>You have category counts — customers per network, dice rolls per face. You expected a pattern; the real counts never match perfectly. The question: is the mismatch <strong>random noise or a real effect?</strong> Chi-square turns the total mismatch into one testable number, for goodness-of-fit and for independence between categorical variables.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>For each category, take the gap $(O-E)$. <strong>Square it</strong> so over/under-counts don't cancel and big gaps count more. Then <strong>divide by $E$</strong> — a gap of 10 is huge if you expected 20 but trivial if you expected 10,000; dividing by $E$ scales the gap to its context. <strong>Sum</strong> across categories for the total discrepancy. Big total → far from expected → reject $H_0$.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$O$</span><div class="tdef"><div class="tname">Observed count</div><div class="ttext">What you actually counted.</div><div class="tfind"><b>find it</b> straight from the data</div></div></div>
+        <div class="term"><span class="sym">$E$</span><div class="tdef"><div class="tname">Expected count</div><div class="ttext">What $H_0$ predicts.</div><div class="tfind"><b>find it</b> e.g. equal split = total ÷ categories</div></div></div>
+        <div class="term"><span class="sym txt">df</span><div class="tdef"><div class="tname">Degrees of freedom</div><div class="ttext">$k-1$ (fit) or $(r-1)(c-1)$ (independence).</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it — are 4 networks equally used?</div>
+      <div class="mini">
+        <p>500 users: A=105, B=140, C=130, D=125; expected 125 each.</p>
+        <p class="step"><b>1</b> $\chi^2=\tfrac{20^2}{125}+\tfrac{15^2}{125}+\tfrac{5^2}{125}+\tfrac{0}{125}=3.2+1.8+0.2+0=5.2$.</p>
+        <p class="step"><b>2</b> df $=3$, critical $\chi^2_{0.05,3}=7.815$. Since $5.2<7.815$ → <b>fail to reject</b>; consistent with equal use.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANOVA -->
+  <section class="fd" id="anova">
+    <div class="fd-head"><span class="fd-num">S31</span><h3 class="fd-title">ANOVA (Analysis of Variance)</h3></div>
+    <p class="fd-sub">Comparing 3+ group means by pitting two kinds of variation against each other.</p>
+    <div class="fbig"><div class="fname">F-ratio</div>$$F=\frac{MSB}{MSW}=\frac{\text{variation between groups}}{\text{variation within groups}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>You tested 3 teaching methods and got 3 different averages. But group averages always differ a little by chance. The question: are the methods <strong>genuinely different, or did the gaps appear from random scatter?</strong> ANOVA answers this for any number of groups at once.</p>
+    </div>
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Compare two variations. <strong>Between-group (MSB):</strong> how far apart the group means are from the overall mean — large if methods truly differ. <strong>Within-group (MSW):</strong> how much individuals scatter inside their own group — the background noise. Take the <strong>ratio</strong>: if between-group variation dwarfs the noise, $F$ is large → real differences; if $F\approx1$, the gaps are no bigger than random scatter → no difference. We divide the sums of squares by their df first (giving mean squares) so the comparison is fair.</p>
+    </div>
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$MSB$</span><div class="tdef"><div class="tname">Mean Square Between</div><div class="ttext">Between-group variation per df.</div><div class="tfind"><b>find it</b> $\tfrac{SSB}{k-1}$, $SSB=\sum n_j(\bar x_j-\bar x)^2$</div></div></div>
+        <div class="term"><span class="sym">$MSW$</span><div class="tdef"><div class="tname">Mean Square Within</div><div class="ttext">Within-group (noise) variation per df.</div><div class="tfind"><b>find it</b> $\tfrac{SSW}{N-k}$, $SSW=\sum\sum(x-\bar x_j)^2$</div></div></div>
+        <div class="term"><span class="sym">$k,N$</span><div class="tdef"><div class="tname">Groups &amp; total observations</div><div class="ttext">df: between $=k-1$, within $=N-k$.</div></div></div>
+      </div>
+    </div>
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>A:10,12,14 · B:14,16,18 · C:18,20,22. Means 12/16/20, grand 16. (Critical $F_{(2,6)}=5.14$.)</p>
+        <p class="step"><b>1</b> $SSB=3[(12{-}16)^2+0+(20{-}16)^2]=96$, $MSB=48$.</p>
+        <p class="step"><b>2</b> Within each: (−2,0,2)→8 each → $SSW=24$, $MSW=4$.</p>
+        <p class="step"><b>3</b> $F=\tfrac{48}{4}=12>5.14$ → reject $H_0$; the methods differ.</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /wrap -->
+
+  <footer>
+    <div class="line"></div>
+    <p>Volume III — the complete statistics reference: descriptive basics, random variables, every distribution, and the full inference framework, all decoded the same way. Pair it with the course site, the formula decoder, and the linear-algebra decoder.</p>
+    <p style="margin-top:8px;opacity:.7;font-family:'JetBrains Mono',monospace;font-size:11.5px">Understand the why, and the formula stops being something to memorize.</p>
+  </footer>
+</main>
+</div>
+
+<script>
+function renderMath(){
+  if(window.renderMathInElement){
+    renderMathInElement(document.body,{
+      delimiters:[
+        {left:"$$",right:"$$",display:true},
+        {left:"$",right:"$",display:false},
+        {left:"\\(",right:"\\)",display:false},
+        {left:"\\[",right:"\\]",display:true}
+      ],
+      throwOnError:false
+    });
+  }
+}
+window.addEventListener('load',renderMath);
+
+var sb=document.getElementById('sidebar'),mb=document.getElementById('menuBtn'),ov=document.getElementById('overlay');
+function toggleMenu(open){sb.classList.toggle('open',open);ov.classList.toggle('show',open);}
+mb.addEventListener('click',function(){toggleMenu(!sb.classList.contains('open'));});
+ov.addEventListener('click',function(){toggleMenu(false);});
+document.querySelectorAll('#sidebar nav a').forEach(function(a){
+  a.addEventListener('click',function(){if(window.innerWidth<=980)toggleMenu(false);});
+});
+
+var prog=document.getElementById('progress');
+function updateProgress(){var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';}
+window.addEventListener('scroll',updateProgress,{passive:true});
+window.addEventListener('resize',updateProgress);updateProgress();
+
+var links=Array.prototype.slice.call(document.querySelectorAll('#sidebar nav a'));
+var sections=links.map(function(l){return document.querySelector(l.getAttribute('href'));});
+function spy(){var pos=window.scrollY+140,current=-1;
+  for(var i=0;i<sections.length;i++){if(sections[i]&&sections[i].offsetTop<=pos)current=i;}
+  links.forEach(function(l){l.classList.remove('active');});
+  if(current>=0)links[current].classList.add('active');}
+window.addEventListener('scroll',spy,{passive:true});spy();
+
+var search=document.getElementById('search');
+search.addEventListener('input',function(){
+  var q=this.value.toLowerCase().trim();
+  links.forEach(function(l){
+    var match=l.textContent.toLowerCase().indexOf(q)>-1;
+    l.classList.toggle('nav-hide',q.length>0&&!match);
+  });
+  document.querySelectorAll('.nav-group').forEach(function(g){
+    var visible=g.querySelectorAll('nav a:not(.nav-hide)').length;
+    g.style.display=(q.length>0&&visible===0)?'none':'';
+  });
+});
+</script>
+</body>
+</html>

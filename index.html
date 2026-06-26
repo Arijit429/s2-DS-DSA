@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Every Formula, Decoded — Maths for Data Science</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#191934; --ink-2:#2c2c52; --ink-soft:#4a4a70;
+  --paper:#F6F4EF; --paper-2:#FBFAF6; --card:#fff;
+  --violet:#5B4BE0; --violet-soft:#EDEBFB;
+  --teal:#0E9C73; --teal-soft:#E2F5EE;
+  --amber:#D9870B; --amber-soft:#FBF0DA;
+  --rose:#D23F5B; --rose-soft:#FBE7EB;
+  --rule:#E4E0D6; --rule-strong:#cdc8ba;
+  --shadow:0 1px 2px rgba(25,25,52,.04),0 8px 24px rgba(25,25,52,.06);
+  --grid:rgba(91,75,224,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:24px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);
+  line-height:1.62;font-size:16px;-webkit-font-smoothing:antialiased;letter-spacing:-.003em}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0%;
+  background:linear-gradient(90deg,var(--violet),var(--amber));z-index:200;transition:width .1s linear}
+
+.layout{display:flex;max-width:1500px;margin:0 auto}
+
+/* sidebar */
+#sidebar{width:312px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;
+  background:var(--ink);color:#cfcde8;padding:30px 16px 60px 26px;border-right:1px solid #000}
+#sidebar::-webkit-scrollbar{width:8px}#sidebar::-webkit-scrollbar-thumb{background:#3a3a5e;border-radius:4px}
+.brand{margin-bottom:22px;padding-right:8px}
+.brand .kicker{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--amber);font-weight:600}
+.brand h1{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:20px;line-height:1.15;
+  color:#fff;margin-top:7px;letter-spacing:-.01em}
+.brand .code{font-family:'JetBrains Mono',monospace;font-size:11px;color:#7c7aa8;margin-top:6px}
+.search-wrap{position:relative;margin-bottom:20px}
+#search{width:100%;padding:9px 12px 9px 32px;border-radius:9px;border:1px solid #34345a;
+  background:#22223f;color:#e8e6f7;font-family:'Inter',sans-serif;font-size:13px}
+#search::placeholder{color:#6f6d99}
+#search:focus{outline:2px solid var(--violet);border-color:transparent}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5}
+.nav-group{margin-bottom:8px}
+.nav-group>.grp-label{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:#6c6a98;font-weight:600;padding:14px 8px 8px;display:flex;align-items:center;gap:8px}
+.nav-group>.grp-label::before{content:"";width:5px;height:5px;border-radius:1px;background:var(--violet)}
+.nav-group.la>.grp-label::before{background:var(--teal)}
+#sidebar nav a{display:block;color:#b4b2d4;text-decoration:none;font-size:13.5px;padding:6px 10px;
+  border-radius:7px;margin:1px 0;line-height:1.35;border-left:2px solid transparent;transition:background .12s,color .12s}
+#sidebar nav a:hover{background:#26264a;color:#fff}
+#sidebar nav a.active{background:#26264a;color:#fff;border-left-color:var(--violet);font-weight:500}
+.nav-group.la nav a.active{border-left-color:var(--teal)}
+.nav-hide{display:none !important}
+
+main{flex:1;min-width:0;padding:0 0 100px}
+.wrap{max-width:860px;margin:0 auto;padding:0 40px}
+
+/* hero */
+.hero{position:relative;overflow:hidden;padding:70px 0 48px;
+  background:linear-gradient(180deg,var(--paper-2),var(--paper));border-bottom:1px solid var(--rule)}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:30px 30px;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 75% 5%,#000,transparent);
+  mask-image:radial-gradient(ellipse 80% 70% at 75% 5%,#000,transparent)}
+.hero .wrap{position:relative;z-index:1}
+.hero .eyebrow{font-family:'JetBrains Mono',monospace;font-size:11.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--violet);font-weight:600;margin-bottom:16px}
+.hero h2{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(32px,4.6vw,50px);
+  line-height:1.04;letter-spacing:-.022em}
+.hero h2 em{font-style:normal;color:var(--violet)}
+.hero p.sub{font-size:17px;color:var(--ink-soft);max-width:580px;margin-top:18px;line-height:1.55}
+.legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+.lchip{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--rule);
+  border-radius:9px;padding:8px 13px;font-size:12.5px;font-weight:500;box-shadow:var(--shadow)}
+.lchip .dot{width:9px;height:9px;border-radius:50%}
+.lchip.why .dot{background:var(--violet)}
+.lchip.from .dot{background:var(--amber)}
+.lchip.terms .dot{background:var(--teal)}
+.lchip.ex .dot{background:var(--rose)}
+
+/* formula deep-dive card */
+section.fd{padding:46px 0 8px;border-bottom:1px solid var(--rule);scroll-margin-top:10px}
+section.fd:last-of-type{border-bottom:none}
+.fd-head{display:flex;align-items:baseline;gap:13px;margin-bottom:6px}
+.fd-num{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--violet);flex-shrink:0;padding-top:5px}
+section.fd.la .fd-num{color:var(--teal)}
+.fd-title{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:26px;letter-spacing:-.018em;line-height:1.12}
+.fd-sub{color:var(--ink-soft);font-size:15px;margin:8px 0 0}
+
+/* big formula display */
+.fbig{background:var(--ink);border-radius:14px;padding:26px 24px;margin:20px 0;position:relative;overflow:hidden;text-align:center}
+.fbig::after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:22px 22px}
+.fbig .katex{color:#fff !important;font-size:1.55em}
+.fbig .katex-display{margin:0;position:relative;z-index:1}
+.fbig .fname{position:relative;z-index:1;font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:14px}
+
+/* part blocks */
+.part{margin:16px 0}
+.plabel{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;margin-bottom:9px}
+.plabel::before{content:"";width:16px;height:3px;border-radius:2px}
+.plabel.why{color:var(--violet)}.plabel.why::before{background:var(--violet)}
+.plabel.from{color:var(--amber)}.plabel.from::before{background:var(--amber)}
+.plabel.terms{color:var(--teal)}.plabel.terms::before{background:var(--teal)}
+.plabel.ex{color:var(--rose)}.plabel.ex::before{background:var(--rose)}
+.part p{margin:7px 0;color:#2e2e44}
+.part strong{color:var(--ink);font-weight:600}
+
+/* anatomy — term decoder */
+.anatomy{background:var(--card);border:1px solid var(--rule);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);margin-top:6px}
+.term{display:flex;gap:14px;padding:13px 16px;border-top:1px solid var(--rule);align-items:flex-start}
+.term:first-child{border-top:none}
+.term:nth-child(even){background:var(--paper-2)}
+.sym{flex-shrink:0;min-width:46px;height:38px;padding:0 10px;border-radius:9px;background:var(--teal-soft);
+  border:1px solid #c3e9da;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.sym .katex{font-size:1.05em;color:#0a6f52}
+.tdef{flex:1;min-width:0}
+.tdef .tname{font-weight:600;color:var(--ink);font-size:14.5px}
+.tdef .ttext{font-size:14px;color:#3a3a52;margin-top:2px}
+.tdef .tfind{font-size:12.8px;color:var(--ink-soft);margin-top:5px;padding-left:11px;border-left:2px solid var(--rule-strong)}
+.tdef .tfind b{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-right:6px}
+
+/* mini example */
+.mini{background:var(--rose-soft);border:1px solid #f1cdd5;border-radius:11px;padding:14px 18px;margin-top:6px}
+.mini p{margin:5px 0;font-size:14.5px;color:#3a2530}
+.mini .step b{color:var(--rose);font-family:'JetBrains Mono',monospace;font-size:12px;margin-right:5px}
+
+/* callouts */
+.callout{border-radius:10px;padding:13px 17px;margin:16px 0;font-size:14.6px;display:flex;gap:12px}
+.callout .ic{flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;
+  width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.key{background:var(--violet-soft);border:1px solid #d8d3f6}.key .ic{background:var(--violet);color:#fff}.key strong{color:#3a2db0}
+.warn{background:var(--amber-soft);border:1px solid #f1dcae}.warn .ic{background:var(--amber);color:#fff}.warn strong{color:#9a5d04}
+.tip{background:var(--teal-soft);border:1px solid #c3e9da}.tip .ic{background:var(--teal);color:#fff}.tip strong{color:#0a6f52}
+
+footer{max-width:860px;margin:0 auto;padding:40px 40px 0;color:var(--ink-soft);font-size:13.5px;text-align:center}
+footer .line{height:1px;background:var(--rule);margin-bottom:24px}
+
+#menuBtn{display:none}#overlay{display:none}
+@media(max-width:980px){
+  #sidebar{position:fixed;left:0;top:0;z-index:150;transform:translateX(-100%);transition:transform .25s ease;width:300px;box-shadow:0 0 40px rgba(0,0,0,.3)}
+  #sidebar.open{transform:translateX(0)}
+  #menuBtn{display:flex;align-items:center;gap:8px;position:fixed;top:14px;left:14px;z-index:160;
+    background:var(--ink);color:#fff;border:none;border-radius:10px;padding:10px 14px;
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shadow)}
+  #overlay.show{display:block;position:fixed;inset:0;background:rgba(20,20,40,.5);z-index:140}
+  .wrap{padding:0 22px}.hero{padding-top:78px}footer{padding-left:22px;padding-right:22px}
+}
+@media(max-width:560px){.fbig .katex{font-size:1.15em}.term{flex-wrap:wrap}}
+:focus-visible{outline:2.5px solid var(--violet);outline-offset:2px;border-radius:4px}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="menuBtn">☰ Formulas</button>
+<div id="overlay"></div>
+
+<div class="layout">
+<aside id="sidebar">
+  <div class="brand">
+    <div class="kicker">Companion · Decoded</div>
+    <h1>Every Formula,<br>Explained</h1>
+    <div class="code">203MDS · beginner build-up</div>
+  </div>
+  <div class="search-wrap">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9b97b8" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="search" type="text" placeholder="Search a formula…" autocomplete="off">
+  </div>
+
+  <div class="nav-group st">
+    <div class="grp-label">Statistics</div>
+    <nav>
+      <a href="#mean">The Mean</a>
+      <a href="#variance">Variance &amp; Std Dev</a>
+      <a href="#cv">Coefficient of Variation</a>
+      <a href="#iqr">IQR &amp; Outlier Rule</a>
+      <a href="#expect">Expectation E(X)</a>
+      <a href="#varx">Variance of an RV</a>
+      <a href="#binom">Binomial Formula</a>
+      <a href="#poisson">Poisson Formula</a>
+      <a href="#zscore">The Z-Score</a>
+      <a href="#se">Standard Error</a>
+      <a href="#ci">Confidence Interval</a>
+      <a href="#chi">Chi-Square</a>
+      <a href="#anova">ANOVA F-Statistic</a>
+    </nav>
+  </div>
+  <div class="nav-group la">
+    <div class="grp-label">Linear Algebra</div>
+    <nav>
+      <a href="#det">Determinant (2×2)</a>
+      <a href="#matmul">Matrix Multiplication</a>
+      <a href="#inv">Matrix Inverse (2×2)</a>
+      <a href="#dot">Dot Product</a>
+      <a href="#cosine">Cosine Similarity</a>
+      <a href="#plane">Distance to a Plane</a>
+      <a href="#eigen">Eigenvalue Equation</a>
+      <a href="#ranknull">Rank–Nullity</a>
+    </nav>
+  </div>
+</aside>
+
+<main>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Read this if the symbols still feel like noise</div>
+      <h2>Stop memorizing.<br><em>Start reading</em> the formula.</h2>
+      <p class="sub">Every formula from the course, taken apart piece by piece — what job it does, where it comes from, what each symbol means, and exactly how to find each number. Built for someone starting from zero.</p>
+      <div class="legend">
+        <div class="lchip why"><span class="dot"></span>Why we need it</div>
+        <div class="lchip from"><span class="dot"></span>Where it comes from</div>
+        <div class="lchip terms"><span class="dot"></span>Each term decoded</div>
+        <div class="lchip ex"><span class="dot"></span>Try it</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+  <!-- ===================== MEAN ===================== -->
+  <section class="fd st" id="mean">
+    <div class="fd-head"><span class="fd-num">F01</span><h3 class="fd-title">The Mean (Average)</h3></div>
+    <p class="fd-sub">The single most basic summary of data — the balance point.</p>
+
+    <div class="fbig"><div class="fname">Arithmetic Mean</div>$$\bar{x}=\frac{\sum x}{n}=\frac{x_1+x_2+\dots+x_n}{n}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Data is a pile of numbers. We want <strong>one number</strong> that represents the whole pile — the "typical" value. The mean is the value where, if every data point handed over its excess and made up everyone's shortfall, all points would end up equal. It's the <strong>balance point</strong> of the data.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>If you want to share a total equally among <em>n</em> people, you add everything up and split it into <em>n</em> equal parts. That's literally all the formula says: <strong>total, divided by how many.</strong> Nothing deeper is hidden in it.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\bar{x}$</span><div class="tdef"><div class="tname">"x-bar" — the mean</div><div class="ttext">The answer you're computing. The bar on top is the universal symbol for "the average of."</div></div></div>
+        <div class="term"><span class="sym">$\sum$</span><div class="tdef"><div class="tname">Sigma — "add all of these up"</div><div class="ttext">A capital Greek S. It just means: go through every value and total them.</div><div class="tfind"><b>find it</b> add every data value together</div></div></div>
+        <div class="term"><span class="sym">$x$</span><div class="tdef"><div class="tname">Each individual data value</div><div class="ttext">$x_1,x_2,\dots$ are your actual numbers.</div></div></div>
+        <div class="term"><span class="sym">$n$</span><div class="tdef"><div class="tname">The count</div><div class="ttext">How many data values you have.</div><div class="tfind"><b>find it</b> just count the data points</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Data: 4, 8, 6, 2.</p>
+        <p class="step"><b>1</b> Sum: $4+8+6+2 = 20$.</p>
+        <p class="step"><b>2</b> Count: $n=4$.</p>
+        <p class="step"><b>3</b> Mean $=\dfrac{20}{4}=5$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VARIANCE ===================== -->
+  <section class="fd st" id="variance">
+    <div class="fd-head"><span class="fd-num">F02</span><h3 class="fd-title">Variance &amp; Standard Deviation</h3></div>
+    <p class="fd-sub">The mean tells you the center. This tells you how spread out the data is.</p>
+
+    <div class="fbig"><div class="fname">Variance → Standard Deviation</div>$$\sigma^2=\frac{\sum(x-\mu)^2}{N}\qquad \sigma=\sqrt{\sigma^2}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Two classes can both average 70 marks — but one might be every student scoring 68–72, the other half scoring 40 and half scoring 100. The mean can't tell them apart. We need a number for <strong>how far values typically sit from the mean</strong>. That's variability.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Natural idea: measure each point's distance from the mean, $(x-\mu)$, and average those distances. But there's a problem — points above the mean give positive distances, points below give negative, and <strong>they cancel out to zero every time.</strong> Useless.</p>
+      <p>Fix: <strong>square</strong> each distance first. Squaring makes everything positive (so nothing cancels), and it also <strong>punishes big deviations harder</strong> than small ones (being 4 away counts as 16, being 2 away counts as 4). Then we average those squared distances. That average is the <strong>variance</strong>.</p>
+      <p>But variance is in "squared units" (squared marks, squared rupees) — awkward to interpret. So we take the <strong>square root</strong> to get back to the original units. That's the <strong>standard deviation</strong> — the headline measure of spread.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\sigma^2$</span><div class="tdef"><div class="tname">Variance ("sigma squared")</div><div class="ttext">The average squared distance from the mean.</div></div></div>
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Standard deviation</div><div class="ttext">Square root of variance — spread in the original units.</div></div></div>
+        <div class="term"><span class="sym">$x-\mu$</span><div class="tdef"><div class="tname">Deviation</div><div class="ttext">How far one data point is from the mean.</div><div class="tfind"><b>find it</b> subtract the mean from each value</div></div></div>
+        <div class="term"><span class="sym">$(x-\mu)^2$</span><div class="tdef"><div class="tname">Squared deviation</div><div class="ttext">The deviation squared — kills negatives, weights big gaps more.</div></div></div>
+        <div class="term"><span class="sym">$\mu$</span><div class="tdef"><div class="tname">Population mean</div><div class="ttext">The average of all the data.</div><div class="tfind"><b>find it</b> compute the mean first (F01)</div></div></div>
+        <div class="term"><span class="sym">$N$</span><div class="tdef"><div class="tname">Population size</div><div class="ttext">How many values. (Sample version uses $n-1$ — see note.)</div></div></div>
+      </div>
+    </div>
+
+    <div class="callout warn"><span class="ic">!</span><div><strong>Population vs sample — the n−1 question.</strong> If your data is a <em>sample</em> (not the whole population), divide by $n-1$ instead of $N$: $s^2=\frac{\sum(x-\bar x)^2}{n-1}$. Reason: you already used the data once to estimate the mean $\bar x$, so one "piece of independent information" is spent. Dividing by $n-1$ corrects for that and stops the formula from underestimating the true spread. Rule of thumb: <strong>whole group → N, a sample → n−1.</strong></div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Data: 2, 4, 6 (treat as a full population).</p>
+        <p class="step"><b>1</b> Mean $\mu=\frac{2+4+6}{3}=4$.</p>
+        <p class="step"><b>2</b> Deviations: $-2, 0, +2$. Squared: $4, 0, 4$.</p>
+        <p class="step"><b>3</b> Variance $=\frac{4+0+4}{3}=\frac{8}{3}\approx2.67$.</p>
+        <p class="step"><b>4</b> Std dev $=\sqrt{2.67}\approx1.63$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CV ===================== -->
+  <section class="fd st" id="cv">
+    <div class="fd-head"><span class="fd-num">F03</span><h3 class="fd-title">Coefficient of Variation</h3></div>
+    <p class="fd-sub">Spread expressed as a percentage of the mean, so you can compare unlike things.</p>
+
+    <div class="fbig"><div class="fname">Coefficient of Variation</div>$$CV=\frac{\sigma}{\bar{x}}\times100\%$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Is a standard deviation of 5 "big"? It depends. 5 around a mean of 10 is huge (half the size). 5 around a mean of 1000 is tiny. Raw standard deviation can't be compared across datasets with different scales or units. CV fixes this by asking: <strong>how big is the spread <em>relative to</em> the mean?</strong></p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>If you divide the spread $(\sigma)$ by the center $(\bar x)$, the units cancel — "marks ÷ marks" leaves a pure number. Multiply by 100 to read it as a percentage. So CV literally says <strong>"the spread is X% of the average."</strong> Bigger CV = more relative variability.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Standard deviation</div><div class="ttext">The spread.</div><div class="tfind"><b>find it</b> compute it via F02</div></div></div>
+        <div class="term"><span class="sym">$\bar{x}$</span><div class="tdef"><div class="tname">Mean</div><div class="ttext">The center.</div><div class="tfind"><b>find it</b> compute it via F01</div></div></div>
+        <div class="term"><span class="sym">$100\%$</span><div class="tdef"><div class="tname">Convert to percent</div><div class="ttext">Just makes the ratio readable as a percentage.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Mean $=50$, SD $=10$.</p>
+        <p class="step"><b>1</b> $CV=\frac{10}{50}\times100\% = 20\%$. The spread is 20% of the mean.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== IQR ===================== -->
+  <section class="fd st" id="iqr">
+    <div class="fd-head"><span class="fd-num">F04</span><h3 class="fd-title">IQR &amp; the Outlier Rule</h3></div>
+    <p class="fd-sub">A spread measure that ignores extremes, plus how to flag the extremes.</p>
+
+    <div class="fbig"><div class="fname">Interquartile Range &amp; Fences</div>$$IQR=Q_3-Q_1\qquad [\,Q_1-1.5\,IQR,\ \ Q_3+1.5\,IQR\,]$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The range (max − min) is wrecked by a single freak value. We want a spread measure that looks at the <strong>bulk of the data and ignores the extremes</strong>. And separately, we want an objective rule to decide what counts as "an extreme" (an outlier) instead of eyeballing it.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Sort the data and chop it into four equal quarters. The cut points are the quartiles $Q_1$ (25% mark) and $Q_3$ (75% mark). The distance between them, $Q_3-Q_1$, is the spread of the <strong>middle 50%</strong> — the heart of the data, untouched by outliers.</p>
+      <p>For the outlier rule, statisticians use one IQR-and-a-half as a "reasonable reach" beyond the middle box. Step that far below $Q_1$ and above $Q_3$ to build <strong>fences</strong>. Anything beyond the fences is unusually far from the bulk → flagged as an outlier. (The 1.5 is a convention chosen to catch genuine outliers without over-flagging.)</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$Q_1$</span><div class="tdef"><div class="tname">First quartile (25th percentile)</div><div class="ttext">25% of the data is below it.</div><div class="tfind"><b>find it</b> sort data; it's the median of the lower half</div></div></div>
+        <div class="term"><span class="sym">$Q_3$</span><div class="tdef"><div class="tname">Third quartile (75th percentile)</div><div class="ttext">75% of the data is below it.</div><div class="tfind"><b>find it</b> sort data; it's the median of the upper half</div></div></div>
+        <div class="term"><span class="sym">$1.5$</span><div class="tdef"><div class="tname">The fence multiplier</div><div class="ttext">A standard convention for "how far is too far."</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$Q_1=20$, $Q_3=40$. Is 75 an outlier?</p>
+        <p class="step"><b>1</b> $IQR=40-20=20$.</p>
+        <p class="step"><b>2</b> Upper fence $=40+1.5(20)=70$.</p>
+        <p class="step"><b>3</b> $75>70$ → yes, an outlier.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EXPECTATION ===================== -->
+  <section class="fd st" id="expect">
+    <div class="fd-head"><span class="fd-num">F05</span><h3 class="fd-title">Expectation E(X)</h3></div>
+    <p class="fd-sub">The "mean" of a random variable — the long-run average outcome.</p>
+
+    <div class="fbig"><div class="fname">Expected Value (discrete)</div>$$E(X)=\sum x\,P(x)$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>When outcomes are random (a dice game, an insurance payout), we want to know: <strong>if I repeated this thousands of times, what would the average result be?</strong> That long-run average is the expectation. It's how you decide if a bet is worth taking.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>An ordinary average weights every value equally. But random outcomes aren't equally likely — rolling a 6 might be rarer than rolling a 1. So instead of a plain average, we take a <strong>weighted average</strong>: each outcome is weighted by <em>how probable it is</em>. Multiply each value by its probability, add them up. Frequent outcomes pull the average toward themselves; rare ones barely move it.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$E(X)$</span><div class="tdef"><div class="tname">Expected value of X</div><div class="ttext">The long-run mean of the random variable.</div></div></div>
+        <div class="term"><span class="sym">$x$</span><div class="tdef"><div class="tname">A possible outcome value</div><div class="ttext">Each value the random variable can take.</div></div></div>
+        <div class="term"><span class="sym">$P(x)$</span><div class="tdef"><div class="tname">Probability of that outcome</div><div class="ttext">The weight — how likely $x$ is.</div><div class="tfind"><b>find it</b> from the problem's probability table; all $P(x)$ sum to 1</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>A game pays ₹0 with prob 0.5, ₹10 with prob 0.3, ₹100 with prob 0.2.</p>
+        <p class="step"><b>1</b> $E(X)=0(0.5)+10(0.3)+100(0.2)$.</p>
+        <p class="step"><b>2</b> $=0+3+20=₹23$ on average per play.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== VAR(X) ===================== -->
+  <section class="fd st" id="varx">
+    <div class="fd-head"><span class="fd-num">F06</span><h3 class="fd-title">Variance of a Random Variable</h3></div>
+    <p class="fd-sub">The shortcut formula — and why it's just the squared-deviation idea again.</p>
+
+    <div class="fbig"><div class="fname">Variance — computational form</div>$$\operatorname{Var}(X)=E(X^2)-\big[E(X)\big]^2$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Same reason as before: knowing the average outcome isn't enough — we want to know how <strong>risky / spread out</strong> the random outcomes are. A lottery and a savings account can have the same expected value but wildly different risk. Variance measures that risk.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>By definition, variance is the expected squared deviation: $E\big[(X-\mu)^2\big]$. If you expand that bracket using algebra and simplify (using $E$'s properties), all the middle terms collapse and you're left with the clean form <strong>$E(X^2)-[E(X)]^2$</strong> — "the mean of the squares minus the square of the mean." It's the same concept as F02, just rearranged into the easiest thing to actually compute.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$E(X)$</span><div class="tdef"><div class="tname">The mean of X</div><div class="ttext">Expected value.</div><div class="tfind"><b>find it</b> $\sum x\,P(x)$ — see F05</div></div></div>
+        <div class="term"><span class="sym">$E(X^2)$</span><div class="tdef"><div class="tname">The mean of X-squared</div><div class="ttext">Square each outcome first, then take the weighted average.</div><div class="tfind"><b>find it</b> $\sum x^2\,P(x)$ — same table, but use $x^2$</div></div></div>
+        <div class="term"><span class="sym">$[E(X)]^2$</span><div class="tdef"><div class="tname">The mean, then squared</div><div class="ttext">Take $E(X)$ and square the single number.</div></div></div>
+      </div>
+    </div>
+    <div class="callout warn"><span class="ic">!</span><div><strong>Don't mix these two up.</strong> $E(X^2)$ = square <em>then</em> average. $[E(X)]^2$ = average <em>then</em> square. They are different numbers, and their difference <em>is</em> the variance.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Given $E(X)=3$ and $E(X^2)=13$.</p>
+        <p class="step"><b>1</b> $\operatorname{Var}(X)=13-3^2=13-9=4$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== BINOMIAL ===================== -->
+  <section class="fd st" id="binom">
+    <div class="fd-head"><span class="fd-num">F07</span><h3 class="fd-title">The Binomial Formula</h3></div>
+    <p class="fd-sub">Probability of getting exactly k successes in n yes/no trials.</p>
+
+    <div class="fbig"><div class="fname">Binomial Probability</div>$$P(X{=}k)=\binom{n}{k}\,p^{k}\,(1-p)^{n-k}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Tons of situations are "do something <em>n</em> times, each time it either works or fails": flip a coin 10 times, test 20 products for defects, 5 patients either recover or don't. We want the probability of <strong>exactly k successes</strong>. Counting by hand gets impossible fast — this formula does it directly.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Build it from three questions:</p>
+      <p><strong>1. What's the chance of one specific success pattern?</strong> Say k successes then the rest failures. Each success has probability $p$, each failure $(1-p)$, and trials are independent so you multiply: $p^k(1-p)^{n-k}$.</p>
+      <p><strong>2. But the k successes could happen in any order.</strong> SSF, SFS, FSS all count. How many orderings are there? That's "choose which k of the n trials are the successes" — the combination $\binom{n}{k}$.</p>
+      <p><strong>3. Add up all those equally-likely patterns:</strong> multiply the count by the per-pattern probability. That's the formula.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$n$</span><div class="tdef"><div class="tname">Number of trials</div><div class="ttext">How many times you repeat the experiment.</div></div></div>
+        <div class="term"><span class="sym">$k$</span><div class="tdef"><div class="tname">Number of successes you want</div><div class="ttext">The exact count you're asking about.</div></div></div>
+        <div class="term"><span class="sym">$p$</span><div class="tdef"><div class="tname">Probability of success on one trial</div><div class="ttext">Stays the same every trial.</div><div class="tfind"><b>find it</b> given in the problem (e.g. fair coin → 0.5)</div></div></div>
+        <div class="term"><span class="sym">$1{-}p$</span><div class="tdef"><div class="tname">Probability of failure</div><div class="ttext">Whatever's left over from success.</div></div></div>
+        <div class="term"><span class="sym">$\binom{n}{k}$</span><div class="tdef"><div class="tname">"n choose k" — the combination</div><div class="ttext">Number of ways to arrange k successes among n trials.</div><div class="tfind"><b>find it</b> $\dfrac{n!}{k!(n-k)!}$</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Fair coin tossed 4 times. P(exactly 2 heads)?  Here $n=4,k=2,p=0.5$.</p>
+        <p class="step"><b>1</b> $\binom{4}{2}=\frac{4!}{2!2!}=6$.</p>
+        <p class="step"><b>2</b> $p^k(1-p)^{n-k}=(0.5)^2(0.5)^2=0.0625$.</p>
+        <p class="step"><b>3</b> $P=6\times0.0625=0.375=\frac{3}{8}$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== POISSON ===================== -->
+  <section class="fd st" id="poisson">
+    <div class="fd-head"><span class="fd-num">F08</span><h3 class="fd-title">The Poisson Formula</h3></div>
+    <p class="fd-sub">Probability of k rare events in a fixed window of time or space.</p>
+
+    <div class="fbig"><div class="fname">Poisson Probability</div>$$P(X{=}k)=\frac{\lambda^{k}\,e^{-\lambda}}{k!}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Some things happen at a steady average rate but at random moments: calls to a helpline per hour, machine breakdowns per week, typos per page. You don't have "n trials" — events just arrive. We want the probability of seeing <strong>exactly k of them</strong> in one window. The Poisson formula handles exactly this.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Imagine slicing the time window into a huge number of tiny instants. In each instant an event either happens or doesn't — that's secretly a binomial with enormous <em>n</em> and tiny <em>p</em>. If you take the binomial formula and let <strong>n → ∞ while keeping the average count $np=\lambda$ fixed</strong>, the math simplifies into the Poisson formula. The $e^{-\lambda}$ falls out of that limit (the constant $e$ always shows up in continuous growth/decay limits), and the $k!$ is the leftover of the binomial's combination term.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\lambda$</span><div class="tdef"><div class="tname">Lambda — the average rate</div><div class="ttext">Expected number of events in the window. <strong>Also equals the variance.</strong></div><div class="tfind"><b>find it</b> given as "average X per period" in the problem</div></div></div>
+        <div class="term"><span class="sym">$k$</span><div class="tdef"><div class="tname">The exact event count you want</div><div class="ttext">0, 1, 2, … — the number you're asking about.</div></div></div>
+        <div class="term"><span class="sym">$e$</span><div class="tdef"><div class="tname">Euler's number ≈ 2.718</div><div class="ttext">A fixed math constant; appears from the limiting process.</div><div class="tfind"><b>find it</b> use the $e^x$ button on a calculator</div></div></div>
+        <div class="term"><span class="sym">$k!$</span><div class="tdef"><div class="tname">k factorial</div><div class="ttext">$k\times(k-1)\times\dots\times1$. Note $0!=1$.</div><div class="tfind"><b>find it</b> e.g. $3!=3\cdot2\cdot1=6$</div></div></div>
+      </div>
+    </div>
+    <div class="callout key"><span class="ic">!</span><div><strong>The headline property:</strong> for Poisson, the mean and the variance are both equal to λ. This single fact is asked constantly.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Breakdowns average λ=2 per week. P(exactly 1 breakdown)?</p>
+        <p class="step"><b>1</b> $P(1)=\dfrac{2^1 e^{-2}}{1!}=2e^{-2}$.</p>
+        <p class="step"><b>2</b> $e^{-2}\approx0.135$, so $P\approx2(0.135)=0.271$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== Z-SCORE ===================== -->
+  <section class="fd st" id="zscore">
+    <div class="fd-head"><span class="fd-num">F09</span><h3 class="fd-title">The Z-Score</h3></div>
+    <p class="fd-sub">How many standard deviations a value sits from the mean.</p>
+
+    <div class="fbig"><div class="fname">Standardization</div>$$Z=\frac{x-\mu}{\sigma}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>"You scored 80" is meaningless alone. 80 out of 100 with class mean 50 is brilliant; 80 with class mean 95 is poor. We need to express a value in terms of <strong>how unusual it is relative to its own distribution</strong>, on a universal scale that lets you compare scores from totally different tests.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Two steps. <strong>(1) Re-center:</strong> subtract the mean, $x-\mu$, so the average becomes 0 and the number tells you how far above/below average you are. <strong>(2) Re-scale:</strong> divide by the standard deviation, so the unit becomes "one standard deviation." Now $Z=2$ means "two standard deviations above the mean" in <em>any</em> dataset. This converts any normal distribution into the one <strong>standard normal</strong> with mean 0 and SD 1.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$x$</span><div class="tdef"><div class="tname">The raw value</div><div class="ttext">The data point you're standardizing.</div></div></div>
+        <div class="term"><span class="sym">$\mu$</span><div class="tdef"><div class="tname">Mean</div><div class="ttext">Center of the distribution.</div><div class="tfind"><b>find it</b> given, or computed via F01</div></div></div>
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Standard deviation</div><div class="ttext">The "ruler" — one unit of spread.</div><div class="tfind"><b>find it</b> given, or computed via F02</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Score $x=80$, mean $\mu=50$, SD $\sigma=15$.</p>
+        <p class="step"><b>1</b> $Z=\frac{80-50}{15}=\frac{30}{15}=2$. The score is 2 SDs above average.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STANDARD ERROR ===================== -->
+  <section class="fd st" id="se">
+    <div class="fd-head"><span class="fd-num">F10</span><h3 class="fd-title">Standard Error</h3></div>
+    <p class="fd-sub">How much a sample mean wobbles — and why bigger samples wobble less.</p>
+
+    <div class="fbig"><div class="fname">Standard Error of the Mean</div>$$SE=\frac{\sigma}{\sqrt{n}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>You take a sample and compute its mean. Take a <em>different</em> sample — you'd get a slightly different mean. Sample means bounce around the true mean from sample to sample. Standard error measures <strong>how much that bounce is</strong>. It's the key ingredient for confidence intervals and every test about a mean.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>When you average $n$ values, the random ups and downs partly <strong>cancel each other out</strong> — one value being too high is offset by another being too low. More values → more cancellation → a steadier average. The math of how variance combines shows the wobble shrinks in proportion to <strong>$\sqrt{n}$</strong>, not $n$ (because variances add, and standard deviation is their square root). So to halve your error you need <em>four times</em> the data. That's why the $\sqrt{}$ is there.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\sigma$</span><div class="tdef"><div class="tname">Population standard deviation</div><div class="ttext">The spread of individual values.</div><div class="tfind"><b>find it</b> given in the problem (or use sample SD $s$ if unknown)</div></div></div>
+        <div class="term"><span class="sym">$n$</span><div class="tdef"><div class="tname">Sample size</div><div class="ttext">How many observations are in your sample.</div></div></div>
+        <div class="term"><span class="sym">$\sqrt{n}$</span><div class="tdef"><div class="tname">Square root of the sample size</div><div class="ttext">The reason large samples give precise means.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\sigma=12$, sample size $n=36$.</p>
+        <p class="step"><b>1</b> $SE=\frac{12}{\sqrt{36}}=\frac{12}{6}=2$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CI ===================== -->
+  <section class="fd st" id="ci">
+    <div class="fd-head"><span class="fd-num">F11</span><h3 class="fd-title">Confidence Interval</h3></div>
+    <p class="fd-sub">Turning a single sample mean into an honest range for the true mean.</p>
+
+    <div class="fbig"><div class="fname">Confidence Interval for the Mean</div>$$\bar{x}\ \pm\ Z\cdot\frac{\sigma}{\sqrt{n}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Your sample mean is a guess for the true population mean, but it's almost never exactly right. Reporting just $\bar x$ pretends to a precision you don't have. A confidence interval is honest: it gives a <strong>range</strong> that very likely contains the true mean, along with how confident you are (e.g. 95%).</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Start from your best guess, the sample mean $\bar x$ (center of the interval). Now reach out on both sides by a <strong>margin of error</strong>. How far? Far enough to capture the true mean with your desired confidence. The margin is built from two pieces: the standard error $\frac{\sigma}{\sqrt n}$ (how much sample means wobble — F10) times a <strong>Z critical value</strong> that says how many standard errors wide to go for your confidence level (1.96 for 95%, because ~95% of a normal sits within 1.96 SDs). Multiply them, add and subtract from $\bar x$.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\bar{x}$</span><div class="tdef"><div class="tname">Sample mean</div><div class="ttext">The center of your interval — your point estimate.</div><div class="tfind"><b>find it</b> average of your sample (F01)</div></div></div>
+        <div class="term"><span class="sym">$Z$</span><div class="tdef"><div class="tname">Critical value for the confidence level</div><div class="ttext">How many standard errors to extend.</div><div class="tfind"><b>find it</b> 90%→1.645, 95%→1.96, 99%→2.576</div></div></div>
+        <div class="term"><span class="sym">$\frac{\sigma}{\sqrt n}$</span><div class="tdef"><div class="tname">Standard error</div><div class="ttext">The wobble of the sample mean.</div><div class="tfind"><b>find it</b> compute via F10</div></div></div>
+        <div class="term"><span class="sym">$\pm$</span><div class="tdef"><div class="tname">Plus and minus</div><div class="ttext">Build the lower end (−) and upper end (+).</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>What "95% confident" really means:</strong> not "95% chance the true mean is in <em>this</em> interval." It means the <em>method</em> works 95% of the time — if you repeated the whole sampling process many times, 95% of the intervals you'd build would capture the true mean.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\bar x=72$, $\sigma=12$, $n=36$, 95% confidence.</p>
+        <p class="step"><b>1</b> $SE=\frac{12}{6}=2$.</p>
+        <p class="step"><b>2</b> Margin $=1.96\times2=3.92$.</p>
+        <p class="step"><b>3</b> CI $=72\pm3.92=(68.08,\ 75.92)$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHI SQUARE ===================== -->
+  <section class="fd st" id="chi">
+    <div class="fd-head"><span class="fd-num">F12</span><h3 class="fd-title">The Chi-Square Statistic</h3></div>
+    <p class="fd-sub">Measuring how far observed counts stray from what you expected.</p>
+
+    <div class="fbig"><div class="fname">Chi-Square</div>$$\chi^2=\sum\frac{(O-E)^2}{E}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>You have category counts — how many customers chose each of 4 networks, how many dice rolls landed on each face. You expected a certain pattern (maybe "equal across all"). The real counts never match perfectly. The question: is the mismatch just <strong>random noise, or a real effect?</strong> Chi-square turns the total mismatch into one number you can test.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>For each category, look at the gap between Observed and Expected, $(O-E)$. <strong>Square it</strong> so over- and under-counts don't cancel and big gaps count more (same trick as variance). Then <strong>divide by E</strong> — this is the clever part: a gap of 10 is a big deal if you only expected 20, but trivial if you expected 10,000. Dividing by E scales the gap to its context. Finally, <strong>sum across all categories</strong> to get the total discrepancy. Big total → observed and expected are far apart → reject the assumption.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$O$</span><div class="tdef"><div class="tname">Observed count</div><div class="ttext">What you actually counted in each category.</div><div class="tfind"><b>find it</b> directly from the data table</div></div></div>
+        <div class="term"><span class="sym">$E$</span><div class="tdef"><div class="tname">Expected count</div><div class="ttext">What you'd expect if the null hypothesis were true.</div><div class="tfind"><b>find it</b> e.g. equal split = total ÷ number of categories</div></div></div>
+        <div class="term"><span class="sym">$\sum$</span><div class="tdef"><div class="tname">Sum over all categories</div><div class="ttext">Add up each category's contribution.</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>Then compare:</strong> compute the degrees of freedom (categories − 1 for a goodness-of-fit test), look up the critical χ² value, and if your calculated χ² exceeds it, reject the null. Otherwise the mismatch is just noise.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>500 users, 4 networks, expecting 125 each. Network A had 105.</p>
+        <p class="step"><b>1</b> A's term $=\frac{(105-125)^2}{125}=\frac{400}{125}=3.20$.</p>
+        <p class="step"><b>2</b> Repeat for B, C, D and add → that total is χ².</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ANOVA ===================== -->
+  <section class="fd st" id="anova">
+    <div class="fd-head"><span class="fd-num">F13</span><h3 class="fd-title">The ANOVA F-Statistic</h3></div>
+    <p class="fd-sub">Comparing 3+ group means by pitting two kinds of variation against each other.</p>
+
+    <div class="fbig"><div class="fname">F-ratio</div>$$F=\frac{MSB}{MSW}=\frac{\text{variation between groups}}{\text{variation within groups}}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>You tested 3 teaching methods and got 3 different average scores. But group averages always differ a little by chance. The question: are the methods <strong>genuinely different, or did the gaps appear just from random student-to-student variation?</strong> ANOVA answers this for any number of groups at once.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Clever idea: compare <strong>two sources of variation</strong>.</p>
+      <p><strong>Between-group variation (MSB):</strong> how far apart the group means are from the overall mean. If the methods truly differ, this is large.</p>
+      <p><strong>Within-group variation (MSW):</strong> how much individuals scatter <em>inside</em> their own group. This is the natural "background noise" that exists no matter what.</p>
+      <p>Take their <strong>ratio</strong>. If between-group variation is much bigger than the background noise, $F$ is large → the group differences are real, not noise. If $F$ is near 1, the gaps between groups are no bigger than the random scatter inside them → no real difference. We divide the sums of squares by their degrees of freedom first (giving "mean squares") so the comparison is fair.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$MSB$</span><div class="tdef"><div class="tname">Mean Square Between</div><div class="ttext">Between-group variation per degree of freedom.</div><div class="tfind"><b>find it</b> $MSB=\dfrac{SSB}{k-1}$, where $SSB=\sum n_j(\bar x_j-\bar x)^2$</div></div></div>
+        <div class="term"><span class="sym">$MSW$</span><div class="tdef"><div class="tname">Mean Square Within</div><div class="ttext">Within-group (noise) variation per degree of freedom.</div><div class="tfind"><b>find it</b> $MSW=\dfrac{SSW}{N-k}$, where $SSW=\sum\sum(x-\bar x_j)^2$</div></div></div>
+        <div class="term"><span class="sym">$k$</span><div class="tdef"><div class="tname">Number of groups</div><div class="ttext">How many groups you're comparing.</div></div></div>
+        <div class="term"><span class="sym">$N$</span><div class="tdef"><div class="tname">Total observations</div><div class="ttext">All data points across every group.</div></div></div>
+        <div class="term"><span class="sym">$\bar x_j$</span><div class="tdef"><div class="tname">Each group's mean</div><div class="ttext">vs $\bar x$, the grand mean of everything.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Three groups, means 12/16/20, grand mean 16, $n=3$ each.</p>
+        <p class="step"><b>1</b> $SSB=3[(12{-}16)^2+0+(20{-}16)^2]=3(32)=96$, so $MSB=96/2=48$.</p>
+        <p class="step"><b>2</b> If $SSW=24$ then $MSW=24/6=4$.</p>
+        <p class="step"><b>3</b> $F=48/4=12$ → far above 1 → groups differ.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DETERMINANT ===================== -->
+  <section class="fd la" id="det">
+    <div class="fd-head"><span class="fd-num">F14</span><h3 class="fd-title">The Determinant (2×2)</h3></div>
+    <p class="fd-sub">One number that tells you if a matrix can be "undone."</p>
+
+    <div class="fbig"><div class="fname">2×2 Determinant</div>$$\det\begin{bmatrix}a&b\\c&d\end{bmatrix}=ad-bc$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>A matrix transforms space (stretches, rotates, shears it). The determinant tells you the <strong>area scaling factor</strong> of that transformation — and crucially, whether the transformation is <strong>reversible</strong>. If the determinant is 0, the matrix squashes 2D space flat onto a line, destroying information that can never be recovered → the matrix has no inverse (it's "singular"). This single number gates inverses, solving equations, and more.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>The columns of the matrix, $\binom{a}{c}$ and $\binom{b}{d}$, are two vectors. They define a parallelogram. The <strong>area of that parallelogram is $ad-bc$</strong> (it's the cross-product area formula in 2D). If the two columns point in the same direction (one is a multiple of the other), the parallelogram is flat — zero area — and $ad-bc=0$. That flatness is exactly what "linearly dependent / singular / no inverse" means.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$a,d$</span><div class="tdef"><div class="tname">The main diagonal entries</div><div class="ttext">Top-left and bottom-right. Their product $ad$ is the first piece.</div></div></div>
+        <div class="term"><span class="sym">$b,c$</span><div class="tdef"><div class="tname">The anti-diagonal entries</div><div class="ttext">Top-right and bottom-left. Their product $bc$ gets subtracted.</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>Instant zero check:</strong> if one row is a multiple of the other (e.g. row 2 = 2 × row 1), the determinant is 0 — the columns are dependent, area is flat, no need to calculate.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\begin{bmatrix}2&3\\1&4\end{bmatrix}$</p>
+        <p class="step"><b>1</b> $ad-bc=(2)(4)-(3)(1)=8-3=5$. Non-zero → invertible.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MATMUL ===================== -->
+  <section class="fd la" id="matmul">
+    <div class="fd-head"><span class="fd-num">F15</span><h3 class="fd-title">Matrix Multiplication</h3></div>
+    <p class="fd-sub">Why it's "rows times columns," and why the shapes must match.</p>
+
+    <div class="fbig"><div class="fname">Entry of a Product</div>$$c_{ij}=\sum_{k} a_{ik}\,b_{kj}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Multiplying matrices <strong>chains two transformations into one</strong>, and it's how you apply a transformation to data, run a layer of a neural network, or combine systems of equations. It's the workhorse operation of all of linear algebra and machine learning.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Each entry of the answer is a <strong>dot product</strong>: take row $i$ from the left matrix and column $j$ from the right matrix, multiply them element-by-element, and add. Why this pattern? Because that's exactly what "apply transformation B, then transformation A" works out to algebraically — each output coordinate is a weighted combination of the inputs, and those weights are a row dotted with a column.</p>
+      <p>This is also <strong>why the inner dimensions must match</strong>: a row of the left and a column of the right have to be the same length to pair up term-by-term. (m×<strong>n</strong>) · (<strong>n</strong>×p) works; the shared n is consumed, leaving an m×p result.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$c_{ij}$</span><div class="tdef"><div class="tname">Output entry, row i column j</div><div class="ttext">The single number you're filling in.</div></div></div>
+        <div class="term"><span class="sym">$a_{ik}$</span><div class="tdef"><div class="tname">Row i of the left matrix</div><div class="ttext">Walks across the row as k changes.</div></div></div>
+        <div class="term"><span class="sym">$b_{kj}$</span><div class="tdef"><div class="tname">Column j of the right matrix</div><div class="ttext">Walks down the column as k changes.</div></div></div>
+        <div class="term"><span class="sym">$\sum_k$</span><div class="tdef"><div class="tname">Sum over the shared dimension</div><div class="ttext">Pair up and add all the products.</div></div></div>
+      </div>
+    </div>
+    <div class="callout warn"><span class="ic">!</span><div><strong>Order matters:</strong> $AB\neq BA$ in general. "Rotate then stretch" is not the same as "stretch then rotate."</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Top-left entry of $\begin{bmatrix}1&2\\3&4\end{bmatrix}\begin{bmatrix}5&6\\7&8\end{bmatrix}$:</p>
+        <p class="step"><b>1</b> Row 1 · Col 1 $=(1)(5)+(2)(7)=5+14=19$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== INVERSE ===================== -->
+  <section class="fd la" id="inv">
+    <div class="fd-head"><span class="fd-num">F16</span><h3 class="fd-title">Matrix Inverse (2×2)</h3></div>
+    <p class="fd-sub">The "undo" matrix — and why the swap-negate-divide recipe works.</p>
+
+    <div class="fbig"><div class="fname">2×2 Inverse</div>$$A^{-1}=\frac{1}{ad-bc}\begin{bmatrix}d&-b\\-c&a\end{bmatrix}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>The inverse <strong>reverses</strong> what a matrix does, and it's how you solve $A\mathbf{x}=\mathbf{b}$ for the unknown $\mathbf{x}$ — the matrix version of dividing. Just like $5x=10$ is solved by multiplying by $\frac{1}{5}$, $A\mathbf{x}=\mathbf{b}$ is solved by multiplying by $A^{-1}$.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>The inverse must satisfy $A\,A^{-1}=I$ (the identity, the "do-nothing" matrix). If you write out that requirement for a general 2×2 and solve the resulting equations, you get exactly this recipe: <strong>swap</strong> the diagonal entries (a↔d), <strong>negate</strong> the off-diagonal entries (b, c), and <strong>divide everything by the determinant</strong>. The division by $ad-bc$ is the same $\frac{1}{5}$ idea — and it instantly explains why a determinant of 0 means no inverse exists: <strong>you can't divide by zero.</strong></p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$ad{-}bc$</span><div class="tdef"><div class="tname">The determinant</div><div class="ttext">If it's 0, stop — no inverse exists.</div><div class="tfind"><b>find it</b> compute via F14</div></div></div>
+        <div class="term"><span class="sym">$d,a$</span><div class="tdef"><div class="tname">Swapped diagonal</div><div class="ttext">a and d trade places.</div></div></div>
+        <div class="term"><span class="sym">$-b,-c$</span><div class="tdef"><div class="tname">Negated off-diagonal</div><div class="ttext">b and c keep their position but flip sign.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$A=\begin{bmatrix}2&1\\5&3\end{bmatrix}$</p>
+        <p class="step"><b>1</b> det $=2(3)-1(5)=1$.</p>
+        <p class="step"><b>2</b> Swap/negate: $\begin{bmatrix}3&-1\\-5&2\end{bmatrix}$, divide by 1.</p>
+        <p class="step"><b>3</b> $A^{-1}=\begin{bmatrix}3&-1\\-5&2\end{bmatrix}$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== DOT PRODUCT ===================== -->
+  <section class="fd la" id="dot">
+    <div class="fd-head"><span class="fd-num">F17</span><h3 class="fd-title">The Dot Product</h3></div>
+    <p class="fd-sub">One number that captures how much two vectors point the same way.</p>
+
+    <div class="fbig"><div class="fname">Dot Product</div>$$\mathbf{a}\cdot\mathbf{b}=\sum_i a_ib_i=\|\mathbf{a}\|\,\|\mathbf{b}\|\cos\theta$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>It answers "how aligned are these two vectors?" — which underlies measuring <strong>similarity</strong> (recommender systems, search, NLP word embeddings), projecting one vector onto another, and testing for perpendicularity. It's arguably the most-used single operation in machine learning.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>There are two faces of the same thing. The <strong>computational</strong> side, $\sum a_ib_i$, just says "multiply matching components and add" — easy to calculate. The <strong>geometric</strong> side, $\|\mathbf a\|\|\mathbf b\|\cos\theta$, reveals its meaning: it's the two lengths multiplied, scaled by $\cos\theta$ of the angle between them. When they point the same way ($\theta=0$, $\cos=1$) the dot product is large and positive; perpendicular ($\theta=90°$, $\cos=0$) gives <strong>zero</strong>; opposite directions give negative. So a dot product of 0 is the clean algebraic signal for "perpendicular."</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$a_i,b_i$</span><div class="tdef"><div class="tname">Matching components</div><div class="ttext">The i-th entry of each vector.</div><div class="tfind"><b>find it</b> pair them up: 1st with 1st, 2nd with 2nd…</div></div></div>
+        <div class="term"><span class="sym">$\|\mathbf a\|$</span><div class="tdef"><div class="tname">Length (magnitude) of a</div><div class="ttext">$\sqrt{a_1^2+a_2^2+\dots}$</div></div></div>
+        <div class="term"><span class="sym">$\theta$</span><div class="tdef"><div class="tname">Angle between the vectors</div><div class="ttext">$\cos\theta$ controls the sign and size.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\mathbf a=(2,3)$, $\mathbf b=(4,1)$.</p>
+        <p class="step"><b>1</b> $(2)(4)+(3)(1)=8+3=11$. Positive → they broadly point the same way.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COSINE ===================== -->
+  <section class="fd la" id="cosine">
+    <div class="fd-head"><span class="fd-num">F18</span><h3 class="fd-title">Cosine Similarity</h3></div>
+    <p class="fd-sub">Dot product, but stripped of length so only direction matters.</p>
+
+    <div class="fbig"><div class="fname">Cosine Similarity</div>$$\cos\theta=\frac{\mathbf{a}\cdot\mathbf{b}}{\|\mathbf{a}\|\,\|\mathbf{b}\|}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Often we care about <strong>direction, not size</strong>. Two documents about the same topic should count as similar even if one is much longer (bigger vector). Plain dot product is inflated by length; cosine similarity removes that so you measure pure orientation — perfect for comparing texts, users, or any feature vectors.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Rearrange the geometric dot product $\mathbf a\cdot\mathbf b=\|\mathbf a\|\|\mathbf b\|\cos\theta$ to solve for $\cos\theta$: just divide both sides by the two lengths. Dividing by the lengths <strong>normalizes</strong> the vectors to unit size, so what's left is only the cosine of the angle — a clean score from −1 (opposite) through 0 (perpendicular) to +1 (identical direction), independent of how long the vectors are.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf a\cdot\mathbf b$</span><div class="tdef"><div class="tname">Dot product (top)</div><div class="ttext">The raw alignment.</div><div class="tfind"><b>find it</b> $\sum a_ib_i$ — see F17</div></div></div>
+        <div class="term"><span class="sym">$\|\mathbf a\|\|\mathbf b\|$</span><div class="tdef"><div class="tname">Product of the two lengths (bottom)</div><div class="ttext">Divides out the magnitudes.</div><div class="tfind"><b>find it</b> $\|\mathbf a\|=\sqrt{\sum a_i^2}$ for each</div></div></div>
+      </div>
+    </div>
+    <div class="callout tip"><span class="ic">i</span><div><strong>Cosine distance</strong> $=1-\cos\theta$. Identical direction → distance 0; perpendicular → distance 1. It converts the similarity into a "how far apart" measure.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$\mathbf a=(1,0)$, $\mathbf b=(1,1)$.</p>
+        <p class="step"><b>1</b> Dot $=1$. Lengths: $\|\mathbf a\|=1$, $\|\mathbf b\|=\sqrt2$.</p>
+        <p class="step"><b>2</b> $\cos\theta=\frac{1}{1\cdot\sqrt2}\approx0.71$ → a 45° angle.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PLANE ===================== -->
+  <section class="fd la" id="plane">
+    <div class="fd-head"><span class="fd-num">F19</span><h3 class="fd-title">Distance from a Point to a Plane</h3></div>
+    <p class="fd-sub">How far a data point sits from a decision boundary.</p>
+
+    <div class="fbig"><div class="fname">Point-to-Hyperplane Distance</div>$$d=\frac{|\mathbf{w}^{T}\mathbf{x}_0+b|}{\|\mathbf{w}\|}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>In classification (e.g. a Support Vector Machine), a hyperplane is the <strong>boundary separating two classes</strong>. How confidently a point belongs to its class depends on <strong>how far it is from that boundary</strong>. This formula gives that distance — central to margins and classifier confidence.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>A plane is written $\mathbf w^T\mathbf x+b=0$, where $\mathbf w$ is the vector <strong>perpendicular to the plane</strong> (its "normal"). Plug your point $\mathbf x_0$ into the left side: $\mathbf w^T\mathbf x_0+b$. On the plane this is 0; off the plane it's non-zero, and its size grows with distance — but it's also inflated by how long $\mathbf w$ is. So you <strong>divide by $\|\mathbf w\|$</strong> to cancel that scaling and get the true geometric distance. The <strong>absolute value</strong> just makes distance positive regardless of which side the point is on.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$\mathbf w$</span><div class="tdef"><div class="tname">Normal vector to the plane</div><div class="ttext">Points perpendicular to the boundary; its entries are the plane's coefficients.</div></div></div>
+        <div class="term"><span class="sym">$\mathbf x_0$</span><div class="tdef"><div class="tname">The point</div><div class="ttext">The coordinates you're measuring from.</div></div></div>
+        <div class="term"><span class="sym">$b$</span><div class="tdef"><div class="tname">The bias / offset</div><div class="ttext">Shifts the plane away from the origin.</div></div></div>
+        <div class="term"><span class="sym">$\mathbf w^T\mathbf x_0$</span><div class="tdef"><div class="tname">Dot product of w and the point</div><div class="ttext">Plugging the point into the plane equation.</div><div class="tfind"><b>find it</b> $\sum w_i x_{0i}$</div></div></div>
+        <div class="term"><span class="sym">$\|\mathbf w\|$</span><div class="tdef"><div class="tname">Length of the normal</div><div class="ttext">Normalizes the result to a true distance.</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>Plane $3x+4y-10=0$ (so $\mathbf w=(3,4)$, $b=-10$), point $(1,1)$.</p>
+        <p class="step"><b>1</b> Top: $|3(1)+4(1)-10|=|-3|=3$.</p>
+        <p class="step"><b>2</b> Bottom: $\|\mathbf w\|=\sqrt{9+16}=5$.</p>
+        <p class="step"><b>3</b> $d=\frac{3}{5}=0.6$.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== EIGEN ===================== -->
+  <section class="fd la" id="eigen">
+    <div class="fd-head"><span class="fd-num">F20</span><h3 class="fd-title">The Eigenvalue Equation</h3></div>
+    <p class="fd-sub">Finding the special directions a matrix only stretches.</p>
+
+    <div class="fbig"><div class="fname">Eigen-equation &amp; how to solve it</div>$$A\mathbf{v}=\lambda\mathbf{v}\ \ \Longrightarrow\ \ \det(A-\lambda I)=0$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>Most vectors get knocked off their direction when a matrix acts on them. A few special ones — the <strong>eigenvectors</strong> — keep their direction and only get scaled. Those directions reveal the "natural axes" of a transformation, and they power <strong>PCA</strong> (finding the directions of greatest variance in data), Google's PageRank, vibration analysis, and much more.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>We want a non-zero vector $\mathbf v$ that the matrix only stretches: $A\mathbf v=\lambda\mathbf v$ (output is just $\lambda$ times the input). Rearrange: $A\mathbf v-\lambda\mathbf v=\mathbf 0$, then $(A-\lambda I)\mathbf v=\mathbf 0$ (the $I$ lets us subtract a scalar from a matrix properly). Now here's the key: this says the matrix $(A-\lambda I)$ squashes a non-zero $\mathbf v$ down to zero. A matrix can only do that if it's <strong>singular</strong> — i.e. its <strong>determinant is 0</strong>. So we solve $\det(A-\lambda I)=0$ to find the $\lambda$ values, then plug each back in to find its $\mathbf v$.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">$A$</span><div class="tdef"><div class="tname">The (square) matrix</div><div class="ttext">The transformation you're analyzing.</div></div></div>
+        <div class="term"><span class="sym">$\lambda$</span><div class="tdef"><div class="tname">Eigenvalue ("lambda")</div><div class="ttext">The stretch factor along an eigenvector.</div><div class="tfind"><b>find it</b> solve $\det(A-\lambda I)=0$</div></div></div>
+        <div class="term"><span class="sym">$\mathbf v$</span><div class="tdef"><div class="tname">Eigenvector</div><div class="ttext">The direction that only gets scaled, not rotated.</div><div class="tfind"><b>find it</b> solve $(A-\lambda I)\mathbf v=\mathbf 0$ for each λ</div></div></div>
+        <div class="term"><span class="sym">$I$</span><div class="tdef"><div class="tname">Identity matrix</div><div class="ttext">Lets you subtract λ from the matrix on the diagonal.</div></div></div>
+      </div>
+    </div>
+    <div class="callout key"><span class="ic">!</span><div><strong>Free sanity checks:</strong> the eigenvalues must add up to the <strong>trace</strong> (sum of the diagonal) and multiply to the <strong>determinant</strong>. Use these to catch arithmetic slips.</div></div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>$A=\begin{bmatrix}4&1\\2&3\end{bmatrix}$</p>
+        <p class="step"><b>1</b> $\det(A-\lambda I)=(4-\lambda)(3-\lambda)-2=\lambda^2-7\lambda+10$.</p>
+        <p class="step"><b>2</b> Solve $=0$: $(\lambda-5)(\lambda-2)=0\Rightarrow\lambda=5,2$.</p>
+        <p class="step"><b>3</b> Check: trace $7=5+2$ ✓, det $10=5\times2$ ✓.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RANK NULLITY ===================== -->
+  <section class="fd la" id="ranknull">
+    <div class="fd-head"><span class="fd-num">F21</span><h3 class="fd-title">The Rank–Nullity Theorem</h3></div>
+    <p class="fd-sub">Every column is accounted for — either it adds a new direction, or it doesn't.</p>
+
+    <div class="fbig"><div class="fname">Rank–Nullity</div>$$\operatorname{rank}(A)+\operatorname{nullity}(A)=\text{number of columns}$$</div>
+
+    <div class="part"><div class="plabel why">Why we need it</div>
+      <p>It connects two ideas — how much "real information" a matrix carries (rank) and how much it "throws away" (nullity) — into one bookkeeping identity. It instantly tells you the size of the solution space of $A\mathbf x=\mathbf 0$ and whether a system has unique or infinitely many solutions.</p>
+    </div>
+
+    <div class="part"><div class="plabel from">Where it comes from</div>
+      <p>Think of each column as contributing one input dimension. When the matrix acts, each column either <strong>adds a genuinely new output direction</strong> (it counts toward the <strong>rank</strong>) or it's redundant — a combination of others — and collapses to zero, contributing a direction to the <strong>null space</strong> (counting toward <strong>nullity</strong>). Every column falls into exactly one bucket, so the two buckets must add back up to the total number of columns. It's conservation of dimensions.</p>
+    </div>
+
+    <div class="part"><div class="plabel terms">Each term, decoded</div>
+      <div class="anatomy">
+        <div class="term"><span class="sym">rank</span><div class="tdef"><div class="tname">Rank of A</div><div class="ttext">Number of linearly independent columns (genuine directions).</div><div class="tfind"><b>find it</b> row-reduce to echelon form, count non-zero rows</div></div></div>
+        <div class="term"><span class="sym">nullity</span><div class="tdef"><div class="tname">Nullity of A</div><div class="ttext">Dimension of the null space — solutions to $A\mathbf x=\mathbf 0$.</div><div class="tfind"><b>find it</b> columns − rank (rearrange this very formula)</div></div></div>
+        <div class="term"><span class="sym">cols</span><div class="tdef"><div class="tname">Number of columns</div><div class="ttext">The total input dimensions of the matrix.</div><div class="tfind"><b>find it</b> just count the columns</div></div></div>
+      </div>
+    </div>
+
+    <div class="part"><div class="plabel ex">Try it</div>
+      <div class="mini">
+        <p>A matrix has 5 columns and rank 3.</p>
+        <p class="step"><b>1</b> nullity $=5-3=2$. Its null space is 2-dimensional.</p>
+      </div>
+    </div>
+  </section>
+
+  </div><!-- /wrap -->
+
+  <footer>
+    <div class="line"></div>
+    <p>Companion to your course site — read a formula here, then go drill it there. Every symbol explained, nothing assumed.</p>
+    <p style="margin-top:8px;opacity:.7;font-family:'JetBrains Mono',monospace;font-size:11.5px">Once a formula reads like a sentence, you'll never need to memorize it again.</p>
+  </footer>
+</main>
+</div>
+
+<script>
+function renderMath(){
+  if(window.renderMathInElement){
+    renderMathInElement(document.body,{
+      delimiters:[
+        {left:"$$",right:"$$",display:true},
+        {left:"$",right:"$",display:false},
+        {left:"\\(",right:"\\)",display:false},
+        {left:"\\[",right:"\\]",display:true}
+      ],
+      throwOnError:false
+    });
+  }
+}
+window.addEventListener('load',renderMath);
+
+var sb=document.getElementById('sidebar'),mb=document.getElementById('menuBtn'),ov=document.getElementById('overlay');
+function toggleMenu(open){sb.classList.toggle('open',open);ov.classList.toggle('show',open);}
+mb.addEventListener('click',function(){toggleMenu(!sb.classList.contains('open'));});
+ov.addEventListener('click',function(){toggleMenu(false);});
+document.querySelectorAll('#sidebar nav a').forEach(function(a){
+  a.addEventListener('click',function(){if(window.innerWidth<=980)toggleMenu(false);});
+});
+
+var prog=document.getElementById('progress');
+function updateProgress(){var h=document.documentElement;var max=h.scrollHeight-h.clientHeight;
+  prog.style.width=(max>0?(h.scrollTop/max*100):0)+'%';}
+window.addEventListener('scroll',updateProgress,{passive:true});
+window.addEventListener('resize',updateProgress);updateProgress();
+
+var links=Array.prototype.slice.call(document.querySelectorAll('#sidebar nav a'));
+var sections=links.map(function(l){return document.querySelector(l.getAttribute('href'));});
+function spy(){var pos=window.scrollY+140,current=-1;
+  for(var i=0;i<sections.length;i++){if(sections[i]&&sections[i].offsetTop<=pos)current=i;}
+  links.forEach(function(l){l.classList.remove('active');});
+  if(current>=0)links[current].classList.add('active');}
+window.addEventListener('scroll',spy,{passive:true});spy();
+
+var search=document.getElementById('search');
+search.addEventListener('input',function(){
+  var q=this.value.toLowerCase().trim();
+  links.forEach(function(l){
+    var match=l.textContent.toLowerCase().indexOf(q)>-1;
+    l.classList.toggle('nav-hide',q.length>0&&!match);
+  });
+  document.querySelectorAll('.nav-group').forEach(function(g){
+    var visible=g.querySelectorAll('nav a:not(.nav-hide)').length;
+    g.style.display=(q.length>0&&visible===0)?'none':'';
+  });
+});
+</script>
+</body>
+</html>
